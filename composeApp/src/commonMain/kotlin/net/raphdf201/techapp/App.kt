@@ -25,11 +25,10 @@ fun App() {
         var showContent by remember { mutableStateOf(false) }
         val darkBackgroundColor = Color(0, 0, 0)
         val lightBackgroundColor = Color(255, 255, 255)
-        var finalColor: Color? = null
-        if (isSystemInDarkTheme()) {
-            finalColor = darkBackgroundColor
+        val finalColor: Color = if (isSystemInDarkTheme()) {
+            darkBackgroundColor
         } else {
-            finalColor = lightBackgroundColor
+            lightBackgroundColor
         }
         Surface(
             modifier = Modifier.fillMaxSize(),
