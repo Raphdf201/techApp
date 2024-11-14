@@ -41,6 +41,11 @@ kotlin {
             implementation(compose.components.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.runtime.compose)
+            implementation(libs.ktor.client.core)
+            implementation(libs.ktor.client.cio)
+            implementation(libs.ktor.client.serialization)
+            implementation(libs.ktor.client.android)
+            implementation(libs.kotlinx.serialization.json)
         }
     }
 }
@@ -74,6 +79,4 @@ android {
 
 dependencies {
     debugImplementation(compose.uiTooling)
-    implementation(libs.ktor.client.core)
-    implementation(libs.ktor.client.cio)
 }
