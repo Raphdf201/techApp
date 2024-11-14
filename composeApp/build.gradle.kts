@@ -46,7 +46,6 @@ kotlin {
             implementation(libs.ktor.client.core)
             implementation(libs.ktor.client.cio)
             implementation(libs.ktor.client.serialization)
-            implementation(libs.ktor.client.darwin)
             implementation(libs.kotlinx.serialization.json)
         }
     }
