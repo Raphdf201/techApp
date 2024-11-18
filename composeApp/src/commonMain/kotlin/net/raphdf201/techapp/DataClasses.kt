@@ -16,7 +16,8 @@ enum class Role {   // TODO : complete
     ELEVE
 }
 
-data class User(                        // SUB 2
+data class User(
+    // SUB 2
     val id: Int,
     val name: String,
     val avatar: String,
