@@ -13,32 +13,33 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalUriHandler
+
 import io.ktor.client.HttpClient
+
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 @Preview
 fun App() {
     MaterialTheme {
-        var showContent by remember { mutableStateOf(false) }
-        var events by remember { mutableStateOf<String?>(null) }
-        val darkBackgroundColor = Color(0, 0, 0)
-        val lightBackgroundColor = Color(255, 255, 255)
+        var textDisp by remember { mutableStateOf<String>("") }
         val client = HttpClient()
+        val uriHandler = LocalUriHandler.current
         val finalColor: Color = if (isSystemInDarkTheme()) {
-            darkBackgroundColor
+            Color(0, 0, 0)
         } else {
-            lightBackgroundColor
+            Color(255, 255, 255)
         }
         Surface(
             modifier = Modifier.fillMaxSize(),
             color = finalColor
         ) {
             LaunchedEffect(key1 = Unit) {
-                events = fetchEvents(client)
+                textDisp = fetchGoogle(client)
             }
-            Text(text = "Result: ${events ?: "Loading..."}")
-
+            Text(text = "Text : ${textDisp}")
+            uriHandler.openUri(textDisp)
         }
     }
 }

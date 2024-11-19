@@ -6,14 +6,14 @@ jobs:
   Gradle:
     runs-on: ubuntu-latest
     steps:
-    - name: checkout code
-      uses: actions/checkout@v2
-    - name: setup jdk
-      uses: actions/setup-java@v1
-      with:
-        java-version: 17
-    - name: Make Gradle executable
-      run: chmod +x ./gradlew
-    - name: Build code
-      run: ./gradlew build
+      - name: checkout code
+        uses: actions/checkout@v2
+      - name: setup jdk
+        uses: actions/setup-java@v1
+        with:
+          java-version: 17
+      - name: Make Gradle executable
+        run: chmod +x ./gradlew
+      - name: Build code
+        run: ./gradlew build
     
