@@ -30,6 +30,7 @@ fun App() {
     MaterialTheme {
         var textDisp by remember { mutableStateOf<String>("") }
         var loginGoogle by remember { mutableStateOf(false) }
+        var token by remember { mutableStateOf<String>("") }
         val client = HttpClient() { followRedirects = false }
         val uriHandler = LocalUriHandler.current
         val finalColor: Color = if (isSystemInDarkTheme()) {

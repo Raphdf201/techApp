@@ -1,21 +1,28 @@
 package net.raphdf201.techapp
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 enum class Team {   // TODO : complete
     TJ, BOTH
 }
 
+@Serializable
 enum class AttendanceType {
     ABSENT, WAITING, PRESENT
 }
 
+@Serializable
 enum class EventStatus {    // TODO : complete
     ACTIVE
 }
 
+@Serializable
 enum class Role {   // TODO : complete
     ELEVE
 }
 
+@Serializable
 data class User(
     // SUB 2
     val id: Int,
@@ -27,11 +34,13 @@ data class User(
     val email: String,
 )
 
+@Serializable
 data class InvitationObject(              // SUB 1
     val id: Int,
     val user: User
 )
 
+@Serializable
 data class AttendanceObject(        // SUB 1
     val id: Int,
     val type: AttendanceType,
@@ -41,11 +50,13 @@ data class AttendanceObject(        // SUB 1
     val user: User
 )
 
+@Serializable
 data class Creator(                 // SUB 1
     val id: Int,
     val name: String
 )
 
+@Serializable
 data class Event(               // BASE
     val id: Int,
     val name: String,
