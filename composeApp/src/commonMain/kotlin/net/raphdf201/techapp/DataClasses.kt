@@ -52,7 +52,8 @@ data class AttendanceObject(        // SUB 1
 )
 
 @Serializable
-data class UserAttendance(          // SUB 1
+data class UserAttendance(
+    // SUB 1
     @SerialName("type")
     val type: AttendanceType,
 )
