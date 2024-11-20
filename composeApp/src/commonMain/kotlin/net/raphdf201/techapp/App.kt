@@ -67,7 +67,7 @@ fun App() {
             if (loginGoogle) {
                 try {
                     uriHandler.openUri(textDisp)
-                } catch (_: Exception) {
+                } catch (_: IllegalArgumentException) {
                 }
             }
         }
