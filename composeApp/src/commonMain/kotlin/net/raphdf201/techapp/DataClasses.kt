@@ -1,5 +1,6 @@
 package net.raphdf201.techapp
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -51,25 +52,58 @@ data class AttendanceObject(        // SUB 1
 )
 
 @Serializable
+data class UserAttendance(          // SUB 1
+    @SerialName("type")
+    val type: AttendanceType,
+)
+
+@Serializable
 data class Creator(                 // SUB 1
+    @SerialName("id")
     val id: Int,
+    @SerialName("completeName")
     val name: String
 )
 
 @Serializable
 data class Event(               // BASE
+    @SerialName("id")
     val id: Int,
+    @SerialName("name")
     val name: String,
+    @SerialName("description")
     val description: String,
+    @SerialName("location")
     val location: String,
+    @SerialName("beginDate")
     val beginDate: String,
+    @SerialName("endDate")
     val endDate: String,
-    val status: EventStatus,
-    val team: Team,
+    @SerialName("status")
+    // val status: EventStatus,
+    val status: String,
+    @SerialName("equipe")
+    // val team: Team,
+    val team: String,
+    @SerialName("maxParticipants")
     val maxParticipants: Int,
-    val creator: Creator,
-    val attendance: AttendanceObject,
-    val invitations: InvitationObject,
+    @SerialName("full")
     val full: Boolean,
-    val userAttendance: AttendanceObject
+    @SerialName("creator")
+    // val creator: Creator,
+    val creator: String,
+    @SerialName("attendance")
+    // val attendance: AttendanceObject,
+    val attendance: String,
+    @SerialName("invitations")
+    // val invitations: InvitationObject,
+    val invitations: String,
+    @SerialName("userAttendance")
+    // val userAttendance: AttendanceObject
+    val userAttendance: String
+)
+
+data class EventState(
+    val isLoading: Boolean = false,
+    val launches: List<Event> = emptyList()
 )

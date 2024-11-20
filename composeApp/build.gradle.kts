@@ -44,6 +44,7 @@ kotlin {
             implementation(libs.androidx.lifecycle.runtime.compose)
             implementation(libs.ktor.client.core)
             implementation(libs.ktor.serialization.kotlinx.json)
+            implementation(libs.ktor.client.content.negotiation)
             implementation(libs.kotlinx.serialization.json)
         }
     }
@@ -77,5 +78,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.androidx.material3.android)
+    implementation(libs.androidx.ui.text.google.fonts)
     debugImplementation(compose.uiTooling)
 }

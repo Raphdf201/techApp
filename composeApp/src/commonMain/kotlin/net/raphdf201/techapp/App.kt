@@ -21,6 +21,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalUriHandler
 
 import io.ktor.client.HttpClient
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.serialization.kotlinx.json.json
+
+import kotlinx.serialization.json.Json
 
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -31,8 +35,16 @@ fun App() {
         var textDisp by remember { mutableStateOf<String>("") }
         var loginGoogle by remember { mutableStateOf(false) }
         var token by remember { mutableStateOf<String>("") }
-        val client = HttpClient() { followRedirects = false }
         val uriHandler = LocalUriHandler.current
+        val jsonClient = HttpClient() {
+            install(ContentNegotiation) {
+                json(Json {
+                    ignoreUnknownKeys = true
+                    useAlternativeNames = false
+                })
+            }
+        }
+        val noRedirClient = HttpClient() { followRedirects = false }
         val finalColor: Color = if (isSystemInDarkTheme()) {
             Color(0, 0, 0)
         } else {
@@ -50,7 +62,7 @@ fun App() {
                 }
             }
             LaunchedEffect(key1 = Unit) {
-                textDisp = fetchGoogle(client)
+                textDisp = fetchGoogle(noRedirClient)
             }
             if (loginGoogle) {
                 try {
