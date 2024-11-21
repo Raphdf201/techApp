@@ -20,19 +20,24 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.UriHandler
+
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.serialization.kotlinx.json.json
+
 import kotlinx.serialization.json.Json
+
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 @Preview
 fun App() {
     MaterialTheme {
-        var textDisp by remember { mutableStateOf<String>("") }
+        var text by remember { mutableStateOf("") }
         var loginGoogle by remember { mutableStateOf(false) }
-        var token by remember { mutableStateOf<String>("") }
+        // var eventsText by remember { mutableStateOf("") }
+        var token by remember { mutableStateOf("") }
+        val getGoogle = HttpClient { followRedirects = false }
         val uriHandler = LocalUriHandler.current
         val jsonClient = HttpClient {
             install(ContentNegotiation) {
@@ -42,18 +47,18 @@ fun App() {
                 })
             }
         }
-        val noRedirClient = HttpClient { followRedirects = false }
         val finalColor: Color = if (isSystemInDarkTheme()) {
             Color(0, 0, 0)
         } else {
             Color(255, 255, 255)
         }
+
         Surface(
             modifier = Modifier.fillMaxSize(),
             color = finalColor
         ) {
             Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-                Button(onClick = { openUri(uriHandler, textDisp) }) {
+                Button(onClick = { openUri(uriHandler, text) }) {
                     Text("Se connecter avec Google")
                 }
                 OutlinedTextField(
@@ -61,9 +66,11 @@ fun App() {
                     onValueChange = { token = it },
                     label = { Text("Token") })
                 Text(token)
+                Text("Events : $eventsText")
             }
             LaunchedEffect(key1 = Unit) {
-                textDisp = fetchGoogle(noRedirClient)
+                text = fetchGoogle(getGoogle)
+                // eventsText = fetchEventsText(jsonClient, staticToken)
             }
         }
     }
