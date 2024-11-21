@@ -1,12 +1,12 @@
 package net.raphdf201.techapp
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -19,13 +19,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalUriHandler
-
+import androidx.compose.ui.platform.UriHandler
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.serialization.kotlinx.json.json
-
 import kotlinx.serialization.json.Json
-
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
@@ -36,7 +34,7 @@ fun App() {
         var loginGoogle by remember { mutableStateOf(false) }
         var token by remember { mutableStateOf<String>("") }
         val uriHandler = LocalUriHandler.current
-        val jsonClient = HttpClient() {
+        val jsonClient = HttpClient {
             install(ContentNegotiation) {
                 json(Json {
                     ignoreUnknownKeys = true
@@ -44,7 +42,7 @@ fun App() {
                 })
             }
         }
-        val noRedirClient = HttpClient() { followRedirects = false }
+        val noRedirClient = HttpClient { followRedirects = false }
         val finalColor: Color = if (isSystemInDarkTheme()) {
             Color(0, 0, 0)
         } else {
@@ -55,21 +53,25 @@ fun App() {
             color = finalColor
         ) {
             Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-                AnimatedVisibility(!loginGoogle) {
-                    Button(onClick = { loginGoogle = true }) {
-                        Text("Se connecter avec Google")
-                    }
+                Button(onClick = { openUri(uriHandler, textDisp) }) {
+                    Text("Se connecter avec Google")
                 }
+                OutlinedTextField(
+                    value = token,
+                    onValueChange = { token = it },
+                    label = { Text("Token") })
+                Text(token)
             }
             LaunchedEffect(key1 = Unit) {
                 textDisp = fetchGoogle(noRedirClient)
             }
-            if (loginGoogle) {
-                try {
-                    uriHandler.openUri(textDisp)
-                } catch (_: IllegalArgumentException) {
-                }
-            }
         }
+    }
+}
+
+fun openUri(handler: UriHandler, uri: String) {
+    try {
+        handler.openUri(uri)
+    } catch (_: IllegalArgumentException) {
     }
 }
