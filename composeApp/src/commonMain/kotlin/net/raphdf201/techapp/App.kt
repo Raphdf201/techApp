@@ -1,9 +1,13 @@
 package net.raphdf201.techapp
 
+import Event
+
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
@@ -20,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.UriHandler
+import androidx.compose.ui.unit.dp
 
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -27,17 +32,17 @@ import io.ktor.serialization.kotlinx.json.json
 
 import kotlinx.serialization.json.Json
 
-import org.jetbrains.compose.ui.tooling.preview.Preview
-
 @Composable
-@Preview
 fun App() {
     MaterialTheme {
         var text by remember { mutableStateOf("") }
         var loginGoogle by remember { mutableStateOf(false) }
-        // var eventsText by remember { mutableStateOf("") }
+        var eventsText by remember { mutableStateOf("") }
+        var events by remember { mutableStateOf(listOf<Event>()) }
         var token by remember { mutableStateOf("") }
-        val getGoogle = HttpClient { followRedirects = false }
+        var tokenValid by remember { mutableStateOf(false) }
+        val staticToken = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjM1LCJlbWFpbCI6ImRlc2NoZW5lcy5yYXBoYWVsQGNyYS5lZHVjYXRpb24iLCJyb2xlIjoiZWxldmUiLCJlcXVpcGUiOiJUSiIsImlhdCI6MTczMjMwMzA2MiwiZXhwIjoxNzMyMzAzOTYyfQ.vYjeT9ZY4rq4HhsR8I9ZxgRkGDfGbEoOgtMxg6ijqRs"
+        val googleClient = HttpClient { followRedirects = false }
         val uriHandler = LocalUriHandler.current
         val jsonClient = HttpClient {
             install(ContentNegotiation) {
@@ -46,32 +51,56 @@ fun App() {
                     useAlternativeNames = false
                 })
             }
+            Json {
+                ignoreUnknownKeys = true
+            }
         }
-        val finalColor: Color = if (isSystemInDarkTheme()) {
-            Color(0, 0, 0)
+        val backgroundColor: Color
+        val textColor: Color
+        if (isSystemInDarkTheme()) {
+            backgroundColor = Color.DarkGray
+            textColor = Color.White
         } else {
-            Color(255, 255, 255)
+            backgroundColor = Color.LightGray
+            textColor = Color.Black
         }
 
         Surface(
             modifier = Modifier.fillMaxSize(),
-            color = finalColor
+            color = backgroundColor
         ) {
             Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-                Button(onClick = { openUri(uriHandler, text) }) {
-                    Text("Se connecter avec Google")
+                AnimatedVisibility(!tokenValid) {
+                    Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+                        Button(onClick = { openUri(uriHandler, text) }) {
+                            Text("Se connecter avec Google")
+                        }
+                        OutlinedTextField(
+                            value = token,
+                            onValueChange = { token = it },
+                            label = { Text("Token", color = textColor) }
+                        )
+                        Button(onClick = {}) {
+                            Text("Valider le token")
+                        }
+                    }
                 }
-                OutlinedTextField(
-                    value = token,
-                    onValueChange = { token = it },
-                    label = { Text("Token") })
-                Text(token)
+                Text("TokenValid : $tokenValid")
                 Text("Events : $eventsText")
+                // EventList(events)
             }
-            LaunchedEffect(key1 = Unit) {
-                text = fetchGoogle(getGoogle)
-                // eventsText = fetchEventsText(jsonClient, staticToken)
-            }
+        }
+        LaunchedEffect(key1 = Unit) {
+            text = fetchGoogle(googleClient)
+            eventsText = fetchEventsText(jsonClient, staticToken)
+        }
+        if (eventsText != "" && eventsText != "{\"message\":\"Unauthorized\",\"statusCode\":401}") {
+            events = Json.decodeFromString(eventsText)
+        } else if (eventsText == "{\"message\":\"Unauthorized\",\"statusCode\":401}") {
+            tokenValid = false
+        }
+        if (events.isNotEmpty()) {
+            Text("Event name : ${events[0].name}")
         }
     }
 }

@@ -43,10 +43,11 @@ kotlin {
             implementation(compose.components.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.runtime.compose)
+            implementation(libs.kotlinx.serialization.json)
             implementation(libs.ktor.client.core)
             implementation(libs.ktor.serialization.kotlinx.json)
             implementation(libs.ktor.client.content.negotiation)
-            implementation(libs.kotlinx.serialization.json)
+            implementation(libs.coil.compose)
         }
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)
@@ -56,12 +57,12 @@ kotlin {
 
 android {
     namespace = "net.raphdf201.techapp"
-    compileSdk = libs.versions.android.compileSdk.get().toInt()
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "net.raphdf201.techapp"
-        minSdk = libs.versions.android.minSdk.get().toInt()
-        targetSdk = libs.versions.android.targetSdk.get().toInt()
+        minSdk = 24
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
     }
