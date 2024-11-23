@@ -31,11 +31,6 @@ suspend fun fetchGoogle(client: HttpClient): String {
     return client.get("https://api.team3990.com/auth/google").headers["Location"].toString()
 }
 
-fun processToken(token: String): String {
-    return if (token.contains(bearer)) token
-    else bearer + token
-}
-
 suspend fun validateToken(client: HttpClient, token: String): Boolean {
     return client.post {
             url {
@@ -44,7 +39,20 @@ suspend fun validateToken(client: HttpClient, token: String): Boolean {
                 path("auth/validate")
             }
             headers {
-                append(Authorization, processToken(token))
+                append(Authorization, token)
             }
         }.bodyAsText().split(":")[1].split("}")[0].toBoolean()
+}
+
+suspend fun refreshToken(client: HttpClient, token: String): String {
+    return bearer + client.post {
+        url {
+            protocol = URLProtocol.HTTPS
+            host = techApiHost
+            path("auth/refresh")
+        }
+        headers {
+            append(Authorization, token)
+        }
+    }.bodyAsText().split(":")[1].split("\"")[0]
 }

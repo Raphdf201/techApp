@@ -7,7 +7,6 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
@@ -24,7 +23,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.UriHandler
-import androidx.compose.ui.unit.dp
 
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -41,7 +39,7 @@ fun App() {
         var events by remember { mutableStateOf(listOf<Event>()) }
         var token by remember { mutableStateOf("") }
         var tokenValid by remember { mutableStateOf(false) }
-        val staticToken = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjM1LCJlbWFpbCI6ImRlc2NoZW5lcy5yYXBoYWVsQGNyYS5lZHVjYXRpb24iLCJyb2xlIjoiZWxldmUiLCJlcXVpcGUiOiJUSiIsImlhdCI6MTczMjMwMzA2MiwiZXhwIjoxNzMyMzAzOTYyfQ.vYjeT9ZY4rq4HhsR8I9ZxgRkGDfGbEoOgtMxg6ijqRs"
+        val staticToken = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjM1LCJlbWFpbCI6ImRlc2NoZW5lcy5yYXBoYWVsQGNyYS5lZHVjYXRpb24iLCJyb2xlIjoiZWxldmUiLCJlcXVpcGUiOiJUSiIsImlhdCI6MTczMjQwNDgyMSwiZXhwIjoxNzMyNDA1NzIxfQ.Q-Uq8n0XSVKqEti0C57VLMqb-RC_t1KhuNXf-7GWWzc"
         val googleClient = HttpClient { followRedirects = false }
         val uriHandler = LocalUriHandler.current
         val jsonClient = HttpClient {
@@ -83,11 +81,11 @@ fun App() {
                         Button(onClick = {}) {
                             Text("Valider le token")
                         }
+                        Button(onClick = {}) {
+                            Text("Refresher le token")
+                        }
                     }
                 }
-                Text("TokenValid : $tokenValid")
-                Text("Events : $eventsText")
-                // EventList(events)
             }
         }
         LaunchedEffect(key1 = Unit) {
