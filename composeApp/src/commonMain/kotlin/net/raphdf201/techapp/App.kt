@@ -7,11 +7,7 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material.Button
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -56,7 +52,7 @@ fun App() {
         val backgroundColor: Color
         val textColor: Color
         if (isSystemInDarkTheme()) {
-            backgroundColor = Color.DarkGray
+            backgroundColor = Color(26, 28, 29)
             textColor = Color.White
         } else {
             backgroundColor = Color.LightGray
@@ -76,7 +72,8 @@ fun App() {
                         OutlinedTextField(
                             value = token,
                             onValueChange = { token = it },
-                            label = { Text("Token", color = textColor) }
+                            label = { Text("Token", color = textColor) },
+                            colors = TextFieldDefaults.outlinedTextFieldColors(textColor = textColor, unfocusedBorderColor = textColor)
                         )
                         Button(onClick = {}) {
                             Text("Valider le token")
