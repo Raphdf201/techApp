@@ -1,19 +1,12 @@
 package net.raphdf201.techapp
 
-import Event
-
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -23,19 +16,23 @@ import androidx.compose.ui.platform.UriHandler
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.serialization.kotlinx.json.json
+import kotlinx.coroutines.launch
 
 import kotlinx.serialization.json.Json
 
+import org.jetbrains.compose.ui.tooling.preview.Preview
+
+@Preview
 @Composable
 fun App() {
     MaterialTheme {
-        var text by remember { mutableStateOf("") }
-        var loginGoogle by remember { mutableStateOf(false) }
+        var googleLink by remember { mutableStateOf("") }
+        var googleLoggedIn by remember { mutableStateOf(false) }
         var eventsText by remember { mutableStateOf("") }
-        var events by remember { mutableStateOf(listOf<Event>()) }
-        var token by remember { mutableStateOf("") }
+        var eventsList by remember { mutableStateOf(listOf<Event>()) }
+        var token by remember { mutableStateOf("Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjM1LCJlbWFpbCI6ImRlc2NoZW5lcy5yYXBoYWVsQGNyYS5lZHVjYXRpb24iLCJyb2xlIjoiZWxldmUiLCJlcXVpcGUiOiJUSiIsImlhdCI6MTczMjQ1NzMxMywiZXhwIjoxNzMyNDU4MjEzfQ.QkFdRd6MmNhPgGrrMMksGrJf4aEnO_fKmeRbNC91s70") }
         var tokenValid by remember { mutableStateOf(false) }
-        val staticToken = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjM1LCJlbWFpbCI6ImRlc2NoZW5lcy5yYXBoYWVsQGNyYS5lZHVjYXRpb24iLCJyb2xlIjoiZWxldmUiLCJlcXVpcGUiOiJUSiIsImlhdCI6MTczMjQwNDgyMSwiZXhwIjoxNzMyNDA1NzIxfQ.Q-Uq8n0XSVKqEti0C57VLMqb-RC_t1KhuNXf-7GWWzc"
+        val corouScope = rememberCoroutineScope()
         val googleClient = HttpClient { followRedirects = false }
         val uriHandler = LocalUriHandler.current
         val jsonClient = HttpClient {
@@ -44,9 +41,6 @@ fun App() {
                     ignoreUnknownKeys = true
                     useAlternativeNames = false
                 })
-            }
-            Json {
-                ignoreUnknownKeys = true
             }
         }
         val backgroundColor: Color
@@ -66,7 +60,7 @@ fun App() {
             Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
                 AnimatedVisibility(!tokenValid) {
                     Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-                        Button(onClick = { openUri(uriHandler, text) }) {
+                        Button(onClick = { corouScope.launch { googleLink = fetchGoogle(googleClient) }; openUri(uriHandler, googleLink) }) {
                             Text("Se connecter avec Google")
                         }
                         OutlinedTextField(
@@ -75,27 +69,26 @@ fun App() {
                             label = { Text("Token", color = textColor) },
                             colors = TextFieldDefaults.outlinedTextFieldColors(textColor = textColor, unfocusedBorderColor = textColor)
                         )
-                        Button(onClick = {}) {
+                        Button(onClick = { corouScope.launch { tokenValid = validateToken(jsonClient, token) } }) {
                             Text("Valider le token")
                         }
-                        Button(onClick = {}) {
+                        Button(onClick = { corouScope.launch { token = refreshToken(jsonClient, token) } }) {
                             Text("Refresher le token")
+                        }
+                        Button(onClick = { corouScope.launch { eventsText = fetchEventsText(jsonClient, token) } }) {
+                            Text("Afficher les évènements")
                         }
                     }
                 }
             }
         }
-        LaunchedEffect(key1 = Unit) {
-            text = fetchGoogle(googleClient)
-            eventsText = fetchEventsText(jsonClient, staticToken)
-        }
         if (eventsText != "" && eventsText != "{\"message\":\"Unauthorized\",\"statusCode\":401}") {
-            events = Json.decodeFromString(eventsText)
+            eventsList = Json.decodeFromString(eventsText)
         } else if (eventsText == "{\"message\":\"Unauthorized\",\"statusCode\":401}") {
             tokenValid = false
         }
-        if (events.isNotEmpty()) {
-            Text("Event name : ${events[0].name}")
+        if (eventsList.isNotEmpty()) {
+            Text("net.raphdf201.techapp.Event name : ${eventsList[0].name}")
         }
     }
 }

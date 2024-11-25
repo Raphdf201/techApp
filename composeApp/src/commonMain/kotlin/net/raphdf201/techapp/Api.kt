@@ -28,7 +28,13 @@ suspend fun fetchEventsText(client: HttpClient, token: String): String {
 }
 
 suspend fun fetchGoogle(client: HttpClient): String {
-    return client.get("https://api.team3990.com/auth/google").headers["Location"].toString()
+    return client.get {
+        url {
+            protocol = URLProtocol.HTTPS
+            host = techApiHost
+            path("auth/google")
+        }
+    }.headers["Location"].toString()
 }
 
 suspend fun validateToken(client: HttpClient, token: String): Boolean {
