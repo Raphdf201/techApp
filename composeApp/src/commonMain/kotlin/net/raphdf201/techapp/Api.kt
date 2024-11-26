@@ -1,5 +1,7 @@
 package net.raphdf201.techapp
 
+import androidx.compose.ui.platform.UriHandler
+
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 import io.ktor.client.request.post
@@ -62,3 +64,9 @@ suspend fun refreshToken(client: HttpClient, token: String): String {
         }
     }.bodyAsText().split(":")[1].split("\"")[0]
 }
+
+fun openUri(handler: UriHandler, uri: String) {
+    try { handler.openUri(uri) }
+    catch (_: IllegalArgumentException) {}
+}
+

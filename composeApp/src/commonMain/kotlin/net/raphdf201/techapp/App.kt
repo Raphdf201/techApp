@@ -5,13 +5,14 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalUriHandler
-import androidx.compose.ui.platform.UriHandler
+import androidx.compose.ui.unit.Dp
 
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -30,7 +31,7 @@ fun App() {
         var googleLoggedIn by remember { mutableStateOf(false) }
         var eventsText by remember { mutableStateOf("") }
         var eventsList by remember { mutableStateOf(listOf<Event>()) }
-        var token by remember { mutableStateOf("Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjM1LCJlbWFpbCI6ImRlc2NoZW5lcy5yYXBoYWVsQGNyYS5lZHVjYXRpb24iLCJyb2xlIjoiZWxldmUiLCJlcXVpcGUiOiJUSiIsImlhdCI6MTczMjQ1NzMxMywiZXhwIjoxNzMyNDU4MjEzfQ.QkFdRd6MmNhPgGrrMMksGrJf4aEnO_fKmeRbNC91s70") }
+        var token by remember { mutableStateOf("") }
         var tokenValid by remember { mutableStateOf(false) }
         val corouScope = rememberCoroutineScope()
         val googleClient = HttpClient { followRedirects = false }
@@ -49,7 +50,7 @@ fun App() {
             backgroundColor = Color(26, 28, 29)
             textColor = Color.White
         } else {
-            backgroundColor = Color.LightGray
+            backgroundColor = Color.White
             textColor = Color.Black
         }
 
@@ -61,7 +62,7 @@ fun App() {
                 AnimatedVisibility(!tokenValid) {
                     Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
                         Button(onClick = { corouScope.launch { googleLink = fetchGoogle(googleClient) }; openUri(uriHandler, googleLink) }) {
-                            Text("Se connecter avec Google")
+                            Text("Accéder au site")
                         }
                         OutlinedTextField(
                             value = token,
@@ -73,10 +74,20 @@ fun App() {
                             Text("Valider le token")
                         }
                         Button(onClick = { corouScope.launch { token = refreshToken(jsonClient, token) } }) {
-                            Text("Refresher le token")
+                            Text("Regénérer le token")
                         }
                         Button(onClick = { corouScope.launch { eventsText = fetchEventsText(jsonClient, token) } }) {
-                            Text("Afficher les évènements")
+                            Text("Télécharger les évènements")
+                        }
+                    }
+                }
+                AnimatedVisibility(tokenValid) {
+                    Column(Modifier.fillMaxWidth().padding(all = Dp(10F)), horizontalAlignment = Alignment.CenterHorizontally) {
+                        Column {
+                            Text("Event1", color = textColor)
+                        }
+                        Column {
+                            Text("Event2", color = textColor)
                         }
                     }
                 }
@@ -87,15 +98,5 @@ fun App() {
         } else if (eventsText == "{\"message\":\"Unauthorized\",\"statusCode\":401}") {
             tokenValid = false
         }
-        if (eventsList.isNotEmpty()) {
-            Text("net.raphdf201.techapp.Event name : ${eventsList[0].name}")
-        }
-    }
-}
-
-fun openUri(handler: UriHandler, uri: String) {
-    try {
-        handler.openUri(uri)
-    } catch (_: IllegalArgumentException) {
     }
 }

@@ -1,0 +1,38 @@
+https://medium.com/@rowaido.game/persistent-data-storage-using-datastore-preferences-in-jetpack-compose-90c481bfed12
+
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+
+class AppStorage(private val dataStore: DataStore<Preferences>) {
+   private companion object {
+       val USER_NAME = stringPreferencesKey("user_name")
+   }
+
+   val currentUserName: Flow<String> =
+       dataStore.data.map { preferences ->
+           preferences[USER_NAME] ?: "Unknown"
+       }
+
+   suspend fun saveUserName(userName: String) {
+       dataStore.edit { preferences ->
+           preferences[USER_NAME] = userName
+       }
+   }
+}
+
+-----------------------------------------------------------
+https://developer.android.com/topic/libraries/architecture/datastore#kts
+
+val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
+val EXAMPLE_COUNTER = intPreferencesKey("example_counter")
+val exampleCounterFlow: Flow<Int> = context.dataStore.data
+  .map { preferences ->
+    // No type safety.
+    preferences[EXAMPLE_COUNTER] ?: 0
+}
+suspend fun incrementCounter() {
+  context.dataStore.edit { settings ->
+    val currentCounterValue = settings[EXAMPLE_COUNTER] ?: 0
+    settings[EXAMPLE_COUNTER] = currentCounterValue + 1
+  }
+}
