@@ -1,11 +1,10 @@
 package net.raphdf201.techapp
 
 import androidx.compose.ui.platform.UriHandler
-
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
-import io.ktor.client.request.post
 import io.ktor.client.request.headers
+import io.ktor.client.request.post
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpHeaders.Authorization
 import io.ktor.http.URLProtocol
@@ -20,7 +19,7 @@ suspend fun fetchEventsText(client: HttpClient, token: String): String {
             protocol = URLProtocol.HTTPS
             host = techApiHost
             path("events/future/with-attendance")
-            parameters.append("limit", "20")
+            parameters.append("limit", "10")
             parameters.append("skip", "0")
         }
         headers {
@@ -41,18 +40,18 @@ suspend fun fetchGoogle(client: HttpClient): String {
 
 suspend fun validateToken(client: HttpClient, token: String): Boolean {
     return client.post {
-            url {
-                protocol = URLProtocol.HTTPS
-                host = techApiHost
-                path("auth/validate")
-            }
-            headers {
-                append(Authorization, token)
-            }
-        }.bodyAsText().split(":")[1].split("}")[0].toBoolean()
+        url {
+            protocol = URLProtocol.HTTPS
+            host = techApiHost
+            path("auth/validate")
+        }
+        headers {
+            append(Authorization, token)
+        }
+    }.bodyAsText().split(":")[1].split("}")[0].toBoolean()
 }
 
-suspend fun refreshToken(client: HttpClient, token: String): String {
+/* suspend fun refreshToken(client: HttpClient, token: String): String {
     return bearer + client.post {
         url {
             protocol = URLProtocol.HTTPS
@@ -63,10 +62,12 @@ suspend fun refreshToken(client: HttpClient, token: String): String {
             append(Authorization, token)
         }
     }.bodyAsText().split(":")[1].split("\"")[0]
-}
+} */
 
 fun openUri(handler: UriHandler, uri: String) {
-    try { handler.openUri(uri) }
-    catch (_: IllegalArgumentException) {}
+    try {
+        handler.openUri(uri)
+    } catch (_: IllegalArgumentException) {
+    }
 }
 

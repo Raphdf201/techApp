@@ -40,34 +40,34 @@ data class Invitation(val id: Int, val user: User)
 data class User(
     val id: Int?,
     val completeName: String?,
-    val avatar: String?,
-    val role: String?,
-    val equipe: String?,
-    val bio: String?,
-    val email: String?,
-    val createdAt: String?,
-    val googleId: String?,
-    val refreshToken: String?,
-    val profileCompleted: Boolean?,
-    val phone: String?,
-    val emergencyPhone: String?,
-    val emergencyRelationship: String?,
-    val hasPassport: Boolean?,
-    val passportExpirationDate: String?,
-    val shirtSize: String?,
-    val hoodieSize: String?,
-    val pantsSize: String?,
-    val foodRestrictions: String?,
-    val epipen: String?, // TODO : Check if bool or str
-    val medicalConditions: String?
+    // val avatar: String?,
+    // val role: String?,
+    // val equipe: String?,
+    // val bio: String?,
+    // val email: String?,
+    // val createdAt: String?,
+    // val googleId: String?,
+    // val refreshToken: String?,
+    // val profileCompleted: Boolean?,
+    // val phone: String?,
+    // val emergencyPhone: String?,
+    // val emergencyRelationship: String?,
+    // val hasPassport: Boolean?,
+    // val passportExpirationDate: String?,
+    // val shirtSize: String?,
+    // val hoodieSize: String?,
+    // val pantsSize: String?,
+    // val foodRestrictions: String?,
+    // val epipen: String?, // TODO : Check if bool or str
+    // val medicalConditions: String?
 )
 
 @Serializable
 data class UserAttendance(
-    val id: Int?,
+    // val id: Int?,
     val type: String?,
-    val from: String?,
-    val to: String?,
-    val markedAt: String?,
-    val user: User?
+    // val from: String?,
+    // val to: String?,
+    // val markedAt: String?,
+    // val user: User?
 )
