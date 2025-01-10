@@ -13,6 +13,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.Dp
+import com.multiplatform.webview.web.WebView
+
+import com.multiplatform.webview.web.rememberWebViewState
 
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -53,6 +56,9 @@ fun App() {
             backgroundColor = Color.White
             textColor = Color.Black
         }
+        corouScope.launch { googleLink = fetchGoogle(googleClient) }
+        val webViewState = rememberWebViewState(googleLink)
+        var launchWebView by remember { mutableStateOf(false) }
 
         Surface(
             modifier = Modifier.fillMaxSize(),
@@ -61,7 +67,7 @@ fun App() {
             Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
                 AnimatedVisibility(!tokenValid) {
                     Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-                        Button(onClick = { corouScope.launch { googleLink = fetchGoogle(googleClient) }; openUri(uriHandler, googleLink) }) {
+                        Button(onClick = { openUri(uriHandler, googleLink) }) {
                             Text("Accéder au site")
                         }
                         OutlinedTextField(
@@ -75,6 +81,9 @@ fun App() {
                         }
                         Button(onClick = { corouScope.launch { token = refreshToken(jsonClient, token) } }) {
                             Text("Regénérer le token")
+                        }
+                        Button(onClick = { launchWebView = true }) {
+                            Text("Se connecter")
                         }
                         Button(onClick = { corouScope.launch { eventsText = fetchEventsText(jsonClient, token) } }) {
                             Text("Télécharger les évènements")
@@ -97,6 +106,10 @@ fun App() {
             eventsList = Json.decodeFromString(eventsText)
         } else if (eventsText == "{\"message\":\"Unauthorized\",\"statusCode\":401}") {
             tokenValid = false
+        }
+        if (launchWebView) {
+            WebView(webViewState, modifier = Modifier.fillMaxSize())
+            launchWebView = false
         }
     }
 }

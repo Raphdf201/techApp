@@ -20,7 +20,7 @@ suspend fun fetchEventsText(client: HttpClient, token: String): String {
             protocol = URLProtocol.HTTPS
             host = techApiHost
             path("events/future/with-attendance")
-            parameters.append("limit", "50")
+            parameters.append("limit", "20")
             parameters.append("skip", "0")
         }
         headers {
