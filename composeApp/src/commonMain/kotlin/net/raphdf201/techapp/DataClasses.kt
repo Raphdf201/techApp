@@ -25,11 +25,11 @@ data class Creator(val id: Int?, val completeName: String?)
 
 @Serializable
 data class Attendance(
-    val id: Int?,
+    // val id: Int?,
     val type: String?,
     val from: String?,
     val to: String?,
-    val markedAt: String?,
+    // val markedAt: String?,
     val user: User?
 )
 
@@ -38,7 +38,7 @@ data class Invitation(val id: Int, val user: User)
 
 @Serializable
 data class User(
-    val id: Int?,
+    // val id: Int?,
     val completeName: String?,
     // val avatar: String?,
     // val role: String?,

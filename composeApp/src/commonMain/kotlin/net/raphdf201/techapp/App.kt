@@ -25,7 +25,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalUriHandler
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 import io.ktor.client.HttpClient
@@ -60,6 +59,7 @@ fun App() {
         }
         val backgroundColor: Color
         val textColor: Color
+        val eventModifier = dp(8).border(width = 2.dp, color = Color.Magenta)
         if (isSystemInDarkTheme()) {
             backgroundColor = Color(26, 28, 29)
             textColor = Color.White
@@ -70,7 +70,7 @@ fun App() {
         corouScope.launch { googleLink = fetchGoogle(googleClient) }
 
         Surface(
-            modifier = Modifier.fillMaxSize(),
+            Modifier.fillMaxSize(),
             color = backgroundColor
         ) {
             Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
@@ -107,25 +107,18 @@ fun App() {
                     Column(
                         Modifier
                             .fillMaxWidth()
-                            .padding(all = Dp(10F))
+                            .padding(all = 10.dp)
                             .verticalScroll(rememberScrollState()),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Column(
-                            Modifier
-                                .fillMaxWidth()
-                                .padding(all = Dp(10F)),
-                            horizontalAlignment = Alignment.CenterHorizontally) {
+                            dp(10),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
                             if (eventsList.isNotEmpty()) {
-                                Column(
-                                    Modifier
-                                        .fillMaxWidth()
-                                        .border(width = 2.dp, color = Color.Black)
-                                        .padding(8.dp)
-                                ) {
+                                Column(eventModifier) {
                                     eventsList[0].name?.let { Text(it, color = textColor) }
-                                    eventsList[0].status?.let { Text(it, color = textColor) }
-                                    eventsList[0].full?.let { Text("Full : $it", color = textColor) }
+                                    eventsList[0].attendance?.get(0)?.type?.let { Text(it, color = textColor) }
                                 }
                             } else {
                                 Text("Aucun évènement", color = textColor)
