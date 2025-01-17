@@ -1,0 +1,29 @@
+name: Build debug APK
+
+on: push
+
+jobs:
+  Gradle:
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout code
+      uses: actions/checkout@v4
+    - name: setup jdk
+      uses: actions/setup-java@v4
+      with:
+        distribution: "temurin"
+        java-version: 21
+    - name: setup gradle
+      uses: gradle/actions/setup-gradle@v4
+      with:
+        cache-disabled: false
+    - name: Make Gradle executable
+      run: chmod +x ./gradlew
+    - name: Build Release APK
+      run: ./gradlew clean build assembleDebug
+    - uses: actions/upload-artifact@v4
+      with:
+        name: unsigned-debug-mediaplayer
+        path: composeApp/build/outputs/apk/debug/composeApp-debug.apk
+        if-no-files-found: error
+        overwrite: true

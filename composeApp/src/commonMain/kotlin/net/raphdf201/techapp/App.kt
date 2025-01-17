@@ -6,8 +6,20 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.Button
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.OutlinedTextField
+import androidx.compose.material.Surface
+import androidx.compose.material.Text
+import androidx.compose.material.TextFieldDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -17,19 +29,18 @@ import androidx.compose.ui.unit.Dp
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.serialization.kotlinx.json.json
+
 import kotlinx.coroutines.launch
 
 import kotlinx.serialization.json.Json
 
-import org.jetbrains.compose.ui.tooling.preview.Preview
-
-@Preview
 @Composable
 fun App() {
     MaterialTheme {
         var googleLink by remember { mutableStateOf("") }
         var eventsText by remember { mutableStateOf("") }
         var eventsList by remember { mutableStateOf(listOf<Event>()) }
+        var eventsLoaded by remember { mutableStateOf(false) }
         var token by remember { mutableStateOf("") }
         var tokenValid by remember { mutableStateOf(false) }
         val corouScope = rememberCoroutineScope()
@@ -42,6 +53,9 @@ fun App() {
                     useAlternativeNames = false
                 })
             }
+        }
+        val jsonDecoder = Json {
+            ignoreUnknownKeys = true
         }
         val backgroundColor: Color
         val textColor: Color
@@ -60,44 +74,64 @@ fun App() {
         ) {
             Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
                 AnimatedVisibility(!tokenValid) {
-                    Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+                    Column(
+                        Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
                         Button(onClick = { openUri(uriHandler, googleLink) }) {
                             Text("Accéder au site")
                         }
+                        Button(onClick = {
+                            corouScope.launch {
+                                tokenValid = validateToken(jsonClient, token)
+                            }
+                        }) {
+                            Text("Valider le token")
+                        }
+                        /* Button(onClick = { corouScope.launch { token = refreshToken(jsonClient, token) } }) {
+                            Text("Regénérer le token")
+                        } */
                         OutlinedTextField(
                             value = token,
                             onValueChange = { token = it },
                             label = { Text("Token", color = textColor) },
-                            colors = TextFieldDefaults.outlinedTextFieldColors(textColor = textColor, unfocusedBorderColor = textColor)
+                            colors = TextFieldDefaults.outlinedTextFieldColors(
+                                textColor = textColor,
+                                unfocusedBorderColor = textColor
+                            )
                         )
-                        Button(onClick = { corouScope.launch { tokenValid = validateToken(jsonClient, token) } }) {
-                            Text("Valider le token")
-                        }
-                        Button(onClick = { corouScope.launch { token = refreshToken(jsonClient, token) } }) {
-                            Text("Regénérer le token")
-                        }
-                        Button(onClick = { corouScope.launch { eventsText = fetchEventsText(jsonClient, token) } }) {
-                            Text("Télécharger les évènements")
-                        }
                     }
                 }
                 AnimatedVisibility(tokenValid) {
-                    Column(Modifier.fillMaxWidth().padding(all = Dp(10F)), horizontalAlignment = Alignment.CenterHorizontally) {
-                        if (eventsList.isNotEmpty()) {
-                            Column {
-                                eventsList[0].name?.let { Text(it, color = textColor) }
+                    Column(
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(all = Dp(10F))
+                            .verticalScroll(rememberScrollState()),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Column(Modifier.fillMaxWidth().padding(all = Dp(10F)), horizontalAlignment = Alignment.CenterHorizontally) {
+                            if (eventsList.isNotEmpty()) {
+                                Column {
+                                    eventsList[0].name?.let { Text(it, color = textColor) }
+                                }
+                            } else {
+                                Text("Aucun évènement", color = textColor)
                             }
-                        } else {
-                            Text("Aucun évènement", color = textColor)
                         }
                     }
                 }
             }
         }
         if (eventsText != "" && eventsText != "{\"message\":\"Unauthorized\",\"statusCode\":401}") {
-            eventsList = Json.decodeFromString(eventsText)
+            eventsList = jsonDecoder.decodeFromString(eventsText)
         } else if (eventsText == "{\"message\":\"Unauthorized\",\"statusCode\":401}") {
             tokenValid = false
+        }
+        if (tokenValid) {
+            corouScope.launch {
+                eventsText = fetchEventsText(jsonClient, token)
+            }
         }
     }
 }
