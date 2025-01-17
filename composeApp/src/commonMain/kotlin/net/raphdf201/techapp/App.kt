@@ -1,6 +1,7 @@
 package net.raphdf201.techapp
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.border
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -25,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -40,7 +42,6 @@ fun App() {
         var googleLink by remember { mutableStateOf("") }
         var eventsText by remember { mutableStateOf("") }
         var eventsList by remember { mutableStateOf(listOf<Event>()) }
-        var eventsLoaded by remember { mutableStateOf(false) }
         var token by remember { mutableStateOf("") }
         var tokenValid by remember { mutableStateOf(false) }
         val corouScope = rememberCoroutineScope()
@@ -110,10 +111,21 @@ fun App() {
                             .verticalScroll(rememberScrollState()),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Column(Modifier.fillMaxWidth().padding(all = Dp(10F)), horizontalAlignment = Alignment.CenterHorizontally) {
+                        Column(
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(all = Dp(10F)),
+                            horizontalAlignment = Alignment.CenterHorizontally) {
                             if (eventsList.isNotEmpty()) {
-                                Column {
+                                Column(
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .border(width = 2.dp, color = Color.Black)
+                                        .padding(8.dp)
+                                ) {
                                     eventsList[0].name?.let { Text(it, color = textColor) }
+                                    eventsList[0].status?.let { Text(it, color = textColor) }
+                                    eventsList[0].full?.let { Text("Full : $it", color = textColor) }
                                 }
                             } else {
                                 Text("Aucun évènement", color = textColor)

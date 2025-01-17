@@ -58,7 +58,7 @@ kotlin {
 
 android {
     namespace = "net.raphdf201.techapp"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "net.raphdf201.techapp"
@@ -78,8 +78,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_21
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
 }
 
