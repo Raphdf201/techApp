@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
@@ -107,23 +109,31 @@ fun App() {
                     Column(
                         Modifier
                             .fillMaxWidth()
-                            .padding(all = 10.dp)
-                            .verticalScroll(rememberScrollState()),
+                            .padding(all = 10.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Column(
-                            dp(10),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            if (eventsList.isNotEmpty()) {
-                                Column(eventModifier) {
-                                    eventsList[0].name?.let { Text(it, color = textColor) }
-                                    eventsList[0].attendance?.get(0)?.type?.let { Text(it, color = textColor) }
+                        if (eventsList.isNotEmpty()) {
+                            Text(eventsList.size.toString(), color = textColor)
+                            LazyColumn(dp(8)) {
+                                items(eventsList.size) {
+                                    Column(eventModifier) {
+                                        eventsList[0].name?.let { Text(it, color = textColor) }
+                                        eventsList[0].attendance?.get(0)?.type?.let { Text(it, color = textColor) }
+                                    }
+                                    Column(eventModifier) {
+                                        eventsList[1].name?.let { Text(it, color = textColor) }
+                                        eventsList[1].attendance?.get(0)?.type?.let { Text(it, color = textColor) }
+                                    }
+                                    Column(eventModifier) {
+                                        eventsList[2].name?.let { Text(it, color = textColor) }
+                                        eventsList[2].attendance?.get(0)?.type?.let { Text(it, color = textColor) }
+                                    }
                                 }
-                            } else {
-                                Text("Aucun évènement", color = textColor)
                             }
+                        } else {
+                            Text("Aucun évènement", color = textColor)
                         }
+
                     }
                 }
             }
