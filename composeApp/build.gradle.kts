@@ -47,7 +47,6 @@ kotlin {
             implementation(libs.ktor.client.core)
             implementation(libs.ktor.serialization.kotlinx.json)
             implementation(libs.ktor.client.content.negotiation)
-            implementation(libs.compose.webview.multiplatform)
             implementation(libs.multiplatform.settings)
         }
         iosMain.dependencies {
@@ -79,8 +78,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_21
     }
 }
 
