@@ -9,8 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
@@ -28,13 +26,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
-
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.serialization.kotlinx.json.json
-
 import kotlinx.coroutines.launch
-
 import kotlinx.serialization.json.Json
 
 @Composable
@@ -61,7 +56,6 @@ fun App() {
         }
         val backgroundColor: Color
         val textColor: Color
-        val eventModifier = dp(8).border(width = 2.dp, color = Color.Magenta)
         if (isSystemInDarkTheme()) {
             backgroundColor = Color(26, 28, 29)
             textColor = Color.White
@@ -69,6 +63,7 @@ fun App() {
             backgroundColor = Color.White
             textColor = Color.Black
         }
+        val eventColumnModifier = dp(8).border(width = 2.dp, color = textColor)
         corouScope.launch { googleLink = fetchGoogle(googleClient) }
 
         Surface(
@@ -109,24 +104,29 @@ fun App() {
                     Column(
                         Modifier
                             .fillMaxWidth()
-                            .padding(all = 10.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                            .padding(all = 10.dp)
                     ) {
+                        Text("")    // Top padding
                         if (eventsList.isNotEmpty()) {
-                            Text(eventsList.size.toString(), color = textColor)
-                            LazyColumn(dp(8)) {
-                                items(eventsList.size) {
-                                    Column(eventModifier) {
-                                        eventsList[0].name?.let { Text(it, color = textColor) }
-                                        eventsList[0].attendance?.get(0)?.type?.let { Text(it, color = textColor) }
-                                    }
-                                    Column(eventModifier) {
-                                        eventsList[1].name?.let { Text(it, color = textColor) }
-                                        eventsList[1].attendance?.get(0)?.type?.let { Text(it, color = textColor) }
-                                    }
-                                    Column(eventModifier) {
-                                        eventsList[2].name?.let { Text(it, color = textColor) }
-                                        eventsList[2].attendance?.get(0)?.type?.let { Text(it, color = textColor) }
+                            LazyColumn(Modifier.fillMaxWidth()) {
+                                items(eventsList.chunked(eventsList.size)) { columnEvents ->
+                                    columnEvents.forEach { event ->
+                                        Column(
+                                            modifier = eventColumnModifier.weight(1f)
+                                        ) {
+                                            event.name?.let {
+                                                Text(
+                                                    it,
+                                                    color = textColor
+                                                )
+                                            }
+                                            event.attendance?.getOrNull(0)?.type?.let {
+                                                Text(
+                                                    it,
+                                                    color = textColor
+                                                )
+                                            }
+                                        }
                                     }
                                 }
                             }
