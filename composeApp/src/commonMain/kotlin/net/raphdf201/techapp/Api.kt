@@ -5,6 +5,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 import io.ktor.client.request.headers
 import io.ktor.client.request.post
+import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpHeaders.Authorization
 import io.ktor.http.URLProtocol
@@ -36,6 +37,28 @@ suspend fun fetchGoogle(client: HttpClient): String {
             path("auth/google")
         }
     }.headers["Location"].toString()
+}
+
+suspend fun changeAttendance(client: HttpClient, token: String, eventId: Int, status: String) {
+    client.post {
+        url {
+            protocol = URLProtocol.HTTPS
+            host = techApiHost
+            path("events/attendance")
+        }
+        headers {
+            append(Authorization, token)
+        }
+        setBody("{\"eventId\":$eventId,\"type\":\"$status\"}")
+    }
+}
+
+fun invertAttendance(attendance: String): String {
+    return when (attendance) {
+        absent -> present
+        present -> absent
+        else -> ""
+    }
 }
 
 suspend fun validateToken(client: HttpClient, token: String): Boolean {

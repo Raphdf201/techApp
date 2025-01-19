@@ -36,3 +36,8 @@ suspend fun incrementCounter() {
     settings[EXAMPLE_COUNTER] = currentCounterValue + 1
   }
 }
+
+----------------------------------------------------------------
+
+change status : POST https://api.team3990.com/events/attendance                          newType
+{"eventId":170,"from":"2025-01-19T14:00:00.000Z","to":"2025-01-19T22:00:00.000Z","type":"present"}

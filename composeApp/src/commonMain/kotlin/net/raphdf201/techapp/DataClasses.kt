@@ -2,6 +2,9 @@ package net.raphdf201.techapp
 
 import kotlinx.serialization.Serializable
 
+val absent = "absent"
+val present = "present"
+
 @Serializable
 data class Event(
     val id: Int?,

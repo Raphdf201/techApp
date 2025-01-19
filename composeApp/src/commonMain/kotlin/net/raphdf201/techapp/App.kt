@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Button
+import androidx.compose.material.ButtonColors
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Surface
@@ -51,6 +53,7 @@ fun App() {
                 })
             }
         }
+        val stdClient = HttpClient()
         val jsonDecoder = Json {
             ignoreUnknownKeys = true
         }
@@ -117,14 +120,30 @@ fun App() {
                                             event.name?.let {
                                                 Text(
                                                     it,
+                                                    Modifier.align(Alignment.Start),
                                                     color = textColor
                                                 )
                                             }
                                             event.attendance?.getOrNull(0)?.type?.let {
-                                                Text(
-                                                    it,
-                                                    color = textColor
-                                                )
+                                                val buttonColor: ButtonColors = when (it) {
+                                                    present -> ButtonDefaults.buttonColors(Color.Green)
+                                                    absent -> ButtonDefaults.buttonColors(Color.Red)
+                                                    else -> ButtonDefaults.buttonColors(Color.Yellow)
+                                                }
+                                                Button(
+                                                    onClick = {
+                                                        corouScope.launch {
+                                                            event.id?.let { it1 ->
+                                                                changeAttendance(stdClient, token,
+                                                                    it1, invertAttendance(it))
+                                                            }
+                                                        }
+                                                    },
+                                                    Modifier.align(Alignment.End),
+                                                    colors = buttonColor
+                                                ) {
+                                                    Text(it, color = textColor)
+                                                }
                                             }
                                         }
                                     }
