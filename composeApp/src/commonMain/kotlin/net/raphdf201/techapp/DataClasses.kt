@@ -20,7 +20,7 @@ data class Event(
     val status: String?,
     val equipe: String?,
     val maxParticipants: Int?,
-    // val creator: Creator?,
+    val creator: Creator?,
     val attendance: List<Attendance>?,
     val invitations: List<Invitation>?,
     val full: Boolean?,
@@ -30,10 +30,8 @@ data class Event(
 /**
  * Data class representing the creator of an [Event]
  */
-/*
 @Serializable
 data class Creator(val id: Int?, val completeName: String?)
-*/
 
 /**
  * Data class representing the attendance of an [Event]

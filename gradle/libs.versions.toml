@@ -4,6 +4,7 @@ androidx-activityCompose = "1.10.0"
 androidx-lifecycle = "2.8.4"
 compose-multiplatform = "1.7.3"
 datastorePreferences = "1.1.2"
+dokka = "2.0.0"
 kotlin = "2.1.0"
 kotlinxSerializationJson = "1.8.0"
 ktor = "3.0.3"
@@ -32,5 +33,6 @@ androidApplication = { id = "com.android.application", version.ref = "agp" }
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
 composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "compose-multiplatform" }
 composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+dokkaHtml = { id = "org.jetbrains.dokka", version.ref = "dokka"}
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
