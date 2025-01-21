@@ -1,3 +1,6 @@
+![GitHub repo size](https://img.shields.io/github/repo-size/raphdf201/techapp)
+![Github build passing](https://github.com/raphdf201/techapp/actions/workflows/gradle.yml/badge.svg)
+
 This is a Kotlin Multiplatform project targeting Android, iOS.
 
 * `/composeApp` is for code that will be shared across your Compose Multiplatform applications.
