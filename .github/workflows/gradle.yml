@@ -17,6 +17,9 @@ jobs:
           java-version: 17
       - name: setup gradle
         uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-disabled: false
+          add-job-summary: 'on-failure'
       - name: make Gradle executable
         run: chmod +x ./gradlew
       - name: build code
