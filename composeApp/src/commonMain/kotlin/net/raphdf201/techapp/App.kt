@@ -4,8 +4,11 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.border
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -66,7 +69,7 @@ fun App() {
             backgroundColor = Color.White
             textColor = Color.Black
         }
-        val eventColumnModifier = dp(8).border(width = 2.dp, color = textColor)
+        val eventRowModifier = dp(8).border(width = 2.dp, color = textColor)
         corouScope.launch { googleLink = fetchGoogle(googleClient) }
 
         Surface(
@@ -93,6 +96,7 @@ fun App() {
                             Text("Regénérer le token")
                         } */
                         OutlinedTextField(
+                            // Modifier,
                             value = token,
                             onValueChange = { token = it },
                             label = { Text("Token", color = textColor) },
@@ -109,42 +113,46 @@ fun App() {
                             .fillMaxWidth()
                             .padding(all = 10.dp)
                     ) {
-                        Text("")    // Top padding
+                        Spacer(Modifier.height(10.dp))
                         if (eventsList.isNotEmpty()) {
                             LazyColumn(Modifier.fillMaxWidth()) {
                                 items(eventsList.chunked(eventsList.size)) { columnEvents ->
                                     columnEvents.forEach { event ->
-                                        Column(
-                                            modifier = eventColumnModifier.weight(1f)
+                                        Row(
+                                            eventRowModifier,//.weight(1f)
+                                            verticalAlignment = Alignment.CenterVertically
                                         ) {
                                             event.name?.let {
                                                 Text(
                                                     it,
-                                                    Modifier.align(Alignment.Start),
+                                                    // Modifier,
                                                     color = textColor
                                                 )
                                             }
-                                            event.attendance?.getOrNull(0)?.type?.let {
-                                                val buttonColor: ButtonColors = when (it) {
+                                            event.attendance?.getOrNull(0)?.type?.let { type ->
+                                                val buttonColor: ButtonColors = when (type) {
                                                     present -> ButtonDefaults.buttonColors(Color.Green)
                                                     absent -> ButtonDefaults.buttonColors(Color.Red)
                                                     else -> ButtonDefaults.buttonColors(Color.Yellow)
                                                 }
                                                 Button(
+                                                    // Modifier,
                                                     onClick = {
                                                         corouScope.launch {
-                                                            event.id?.let { it1 ->
+                                                            event.id?.let { eventId ->
                                                                 changeAttendance(
                                                                     stdClient, token,
-                                                                    it1, invertAttendance(it)
+                                                                    eventId, invertAttendance(type)
                                                                 )
                                                             }
                                                         }
                                                     },
-                                                    Modifier.align(Alignment.End),
                                                     colors = buttonColor
                                                 ) {
-                                                    Text(it, color = textColor)
+                                                    Text(
+                                                        type,
+                                                        // Modifier,
+                                                        color = textColor)
                                                 }
                                             }
                                         }

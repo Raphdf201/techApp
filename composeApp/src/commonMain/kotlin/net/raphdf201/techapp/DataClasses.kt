@@ -69,8 +69,8 @@ data class User(
 data class UserAttendance(
     // val id: Int?,
     val type: String?,
-    val from: String?,
-    val to: String?,
-    val markedAt: String?,
+    // val from: String?,
+    // val to: String?,
+    // val markedAt: String?,
     // val user: User?
 )
