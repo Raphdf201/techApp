@@ -37,6 +37,9 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 
+/**
+ * The main composable function for the application
+ */
 @Composable
 fun App() {
     MaterialTheme {

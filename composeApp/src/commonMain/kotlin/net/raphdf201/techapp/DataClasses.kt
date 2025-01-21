@@ -4,7 +4,11 @@ import kotlinx.serialization.Serializable
 
 const val absent = "absent"
 const val present = "present"
+const val techApiHost = "api.team3990.com"
 
+/**
+ * Data class representing an event
+ */
 @Serializable
 data class Event(
     val id: Int?,
@@ -23,9 +27,15 @@ data class Event(
     val userAttendance: UserAttendance?
 )
 
+/**
+ * Data class representing the creator of an [Event]
+ */
 @Serializable
 data class Creator(val id: Int?, val completeName: String?)
 
+/**
+ * Data class representing the attendance of an [Event]
+ */
 @Serializable
 data class Attendance(
     // val id: Int?,
@@ -36,9 +46,15 @@ data class Attendance(
     val user: User?
 )
 
+/**
+ * Data class representing the invitation to an [Event]
+ */
 @Serializable
 data class Invitation(val id: Int, val user: User)
 
+/**
+ * Data class representing a user
+ */
 @Serializable
 data class User(
     // val id: Int?,
@@ -65,6 +81,9 @@ data class User(
     // val medicalConditions: String?
 )
 
+/**
+ * Data class representing the attendance of a [User] to an [Event]
+ */
 @Serializable
 data class UserAttendance(
     // val id: Int?,

@@ -11,9 +11,11 @@ import io.ktor.http.HttpHeaders.Authorization
 import io.ktor.http.URLProtocol
 import io.ktor.http.path
 
-const val techApiHost = "api.team3990.com"
-const val bearer = "Bearer "
-
+/**
+ *  Fetches the events from the API and returns them as a JSON string
+ *  @param client the ktor client to use
+ *  @param token the bearer token to use, provided by the [auth/google](api.team3990.com/auth/google) endpoint
+ */
 suspend fun fetchEventsText(client: HttpClient, token: String): String {
     return client.get {
         url {
@@ -29,6 +31,10 @@ suspend fun fetchEventsText(client: HttpClient, token: String): String {
     }.bodyAsText()
 }
 
+/**
+ *  Fetches the google link from the API and returns it
+ *  @param client the ktor client to use
+ */
 suspend fun fetchGoogle(client: HttpClient): String {
     return client.get {
         url {
@@ -53,6 +59,14 @@ suspend fun changeAttendance(client: HttpClient, token: String, eventId: Int, st
     }
 }
 
+/**
+ * Inverts the attendance type
+ *
+ * - absent -> present
+ * - present -> absent
+ *
+ * @param attendance the attendance type to invert
+ */
 fun invertAttendance(attendance: String): String {
     return when (attendance) {
         absent -> present
@@ -61,6 +75,9 @@ fun invertAttendance(attendance: String): String {
     }
 }
 
+/**
+ * Validates the token using the [auth/validate](api.team3990.com/auth/validate) endpoint
+ */
 suspend fun validateToken(client: HttpClient, token: String): Boolean {
     return client.post {
         url {
@@ -74,6 +91,9 @@ suspend fun validateToken(client: HttpClient, token: String): Boolean {
     }.bodyAsText().split(":")[1].split("}")[0].toBoolean()
 }
 
+/**
+ * Refresh the token using the [auth/refresh](api.team3990.com/auth/refresh) endpoint
+ */
 /* suspend fun refreshToken(client: HttpClient, token: String): String {
     return bearer + client.post {
         url {
@@ -87,6 +107,9 @@ suspend fun validateToken(client: HttpClient, token: String): Boolean {
     }.bodyAsText().split(":")[1].split("\"")[0]
 } */
 
+/**
+ * Uses the [UriHandler] to open an URL in the default browser
+ */
 fun openUri(handler: UriHandler, uri: String) {
     try {
         handler.openUri(uri)
