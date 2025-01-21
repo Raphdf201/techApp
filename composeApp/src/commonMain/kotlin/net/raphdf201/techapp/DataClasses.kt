@@ -30,8 +30,10 @@ data class Event(
 /**
  * Data class representing the creator of an [Event]
  */
+/*
 @Serializable
 data class Creator(val id: Int?, val completeName: String?)
+*/
 
 /**
  * Data class representing the attendance of an [Event]
