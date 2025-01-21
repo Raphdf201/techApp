@@ -2,8 +2,8 @@ package net.raphdf201.techapp
 
 import kotlinx.serialization.Serializable
 
-val absent = "absent"
-val present = "present"
+const val absent = "absent"
+const val present = "present"
 
 @Serializable
 data class Event(
@@ -16,7 +16,7 @@ data class Event(
     val status: String?,
     val equipe: String?,
     val maxParticipants: Int?,
-    val creator: Creator?,
+    // val creator: Creator?,
     val attendance: List<Attendance>?,
     val invitations: List<Invitation>?,
     val full: Boolean?,
@@ -69,8 +69,8 @@ data class User(
 data class UserAttendance(
     // val id: Int?,
     val type: String?,
-    // val from: String?,
-    // val to: String?,
-    // val markedAt: String?,
+    val from: String?,
+    val to: String?,
+    val markedAt: String?,
     // val user: User?
 )

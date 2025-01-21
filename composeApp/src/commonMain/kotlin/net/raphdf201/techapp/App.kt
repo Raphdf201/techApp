@@ -134,8 +134,10 @@ fun App() {
                                                     onClick = {
                                                         corouScope.launch {
                                                             event.id?.let { it1 ->
-                                                                changeAttendance(stdClient, token,
-                                                                    it1, invertAttendance(it))
+                                                                changeAttendance(
+                                                                    stdClient, token,
+                                                                    it1, invertAttendance(it)
+                                                                )
                                                             }
                                                         }
                                                     },
