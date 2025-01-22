@@ -1,6 +1,7 @@
-package net.raphdf201.techapp
+package net.raphdf201.techapp.network
 
 import androidx.compose.ui.platform.UriHandler
+
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 import io.ktor.client.request.headers
@@ -10,6 +11,9 @@ import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpHeaders.Authorization
 import io.ktor.http.URLProtocol
 import io.ktor.http.path
+import net.raphdf201.techapp.vals.absent
+import net.raphdf201.techapp.vals.present
+import net.raphdf201.techapp.vals.techApiHost
 
 /**
  *  Fetches the events from the API and returns them as a JSON string
