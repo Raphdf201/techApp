@@ -30,14 +30,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 import io.ktor.client.HttpClient
 import kotlinx.coroutines.launch
 import net.raphdf201.techapp.network.changeAttendance
 import net.raphdf201.techapp.network.fetchEventsText
 import net.raphdf201.techapp.network.fetchGoogle
 import net.raphdf201.techapp.network.invertAttendance
-import net.raphdf201.techapp.network.openUri
 import net.raphdf201.techapp.network.netStatus
+import net.raphdf201.techapp.network.openUri
 import net.raphdf201.techapp.network.validateToken
 import net.raphdf201.techapp.vals.Event
 import net.raphdf201.techapp.vals.absent
@@ -51,7 +53,7 @@ import net.raphdf201.techapp.vals.present
  * The main composable function for the application
  */
 @Composable
-fun App() {
+fun App(prefs: DataStore<Preferences>) {
     MaterialTheme {
         var eventsText by remember { mutableStateOf("") }
         var eventsList by remember { mutableStateOf(listOf<Event>()) }
@@ -127,7 +129,13 @@ fun App() {
                                             Arrangement.SpaceEvenly,
                                             Alignment.CenterVertically
                                         ) {
-                                            event.name?.let { Text(it, Modifier.padding(8.dp), textColor) }
+                                            event.name?.let {
+                                                Text(
+                                                    it,
+                                                    Modifier.padding(8.dp),
+                                                    textColor
+                                                )
+                                            }
                                             event.attendance?.getOrNull(0)?.type?.let { type ->
                                                 val buttonColor: ButtonColors = when (type) {
                                                     present -> ButtonDefaults.buttonColors(Color.Green)

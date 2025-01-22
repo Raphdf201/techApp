@@ -1,8 +1,14 @@
 package net.raphdf201.techapp.storage
 
-interface DataStoreWrapper {
-    suspend fun saveData(key: String, value: String)
-    suspend fun getData(key: String): String?
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.PreferenceDataStoreFactory
+import androidx.datastore.preferences.core.Preferences
+import okio.Path.Companion.toPath
+
+fun createDataStore(producePath: () -> String): DataStore<Preferences> {
+    return PreferenceDataStoreFactory.createWithPath(
+        produceFile = { producePath().toPath() }
+    )
 }
 
-
+internal const val DATA_STORE_FILE_NAME = "prefs.preferences_pb"
