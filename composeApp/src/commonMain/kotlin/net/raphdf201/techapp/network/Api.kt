@@ -15,13 +15,15 @@ import net.raphdf201.techapp.vals.absent
 import net.raphdf201.techapp.vals.present
 import net.raphdf201.techapp.vals.techApiHost
 
+var result = ""
+
 /**
  *  Fetches the events from the API and returns them as a JSON string
  *  @param client the ktor client to use
  *  @param token the bearer token to use, provided by the [auth/google](api.team3990.com/auth/google) endpoint
  */
 suspend fun fetchEventsText(client: HttpClient, token: String): String {
-    return client.get {
+    val resp = client.get {
         url {
             protocol = URLProtocol.HTTPS
             host = techApiHost
@@ -32,7 +34,9 @@ suspend fun fetchEventsText(client: HttpClient, token: String): String {
         headers {
             append(Authorization, token)
         }
-    }.bodyAsText()
+    }
+    result = resp.status.toString()
+    return resp.bodyAsText()
 }
 
 /**
@@ -83,7 +87,7 @@ fun invertAttendance(attendance: String): String {
  * Validates the token using the [auth/validate](api.team3990.com/auth/validate) endpoint
  */
 suspend fun validateToken(client: HttpClient, token: String): Boolean {
-    return client.post {
+    val resp = client.post {
         url {
             protocol = URLProtocol.HTTPS
             host = techApiHost
@@ -92,7 +96,9 @@ suspend fun validateToken(client: HttpClient, token: String): Boolean {
         headers {
             append(Authorization, token)
         }
-    }.bodyAsText().split(":")[1].split("}")[0].toBoolean()
+    }
+    result = resp.status.toString()
+    return resp.bodyAsText().split(":")[1].split("}")[0].toBoolean()
 }
 
 /**
@@ -117,7 +123,7 @@ suspend fun validateToken(client: HttpClient, token: String): Boolean {
 fun openUri(handler: UriHandler, uri: String) {
     try {
         handler.openUri(uri)
-    } catch (_: IllegalArgumentException) {
+    } catch (error: IllegalArgumentException) {
+        error.printStackTrace()
     }
 }
-

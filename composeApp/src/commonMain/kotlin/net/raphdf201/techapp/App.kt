@@ -2,6 +2,7 @@ package net.raphdf201.techapp
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -29,15 +30,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
 import io.ktor.client.HttpClient
+import io.ktor.util.logging.Logger
 import kotlinx.coroutines.launch
 import net.raphdf201.techapp.network.changeAttendance
 import net.raphdf201.techapp.network.fetchEventsText
 import net.raphdf201.techapp.network.fetchGoogle
 import net.raphdf201.techapp.network.invertAttendance
 import net.raphdf201.techapp.network.openUri
+import net.raphdf201.techapp.network.result
 import net.raphdf201.techapp.network.validateToken
 import net.raphdf201.techapp.vals.Event
 import net.raphdf201.techapp.vals.absent
+import net.raphdf201.techapp.vals.grey
 import net.raphdf201.techapp.vals.jsonClient
 import net.raphdf201.techapp.vals.jsonDecoder
 import net.raphdf201.techapp.vals.modifier
@@ -59,7 +63,7 @@ fun App() {
         val backgroundColor: Color
         val textColor: Color
         if (dark) {
-            backgroundColor = Color(26, 28, 29)
+            backgroundColor = grey
             textColor = Color.White
         } else {
             backgroundColor = Color.White
@@ -84,14 +88,14 @@ fun App() {
                                 )
                             }
                         }) {
-                            Text("Accéder au site")
+                            Text("Accéder au site", Modifier, textColor)
                         }
                         Button({
                             corouScope.launch {
                                 tokenValid = validateToken(jsonClient, token)
                             }
                         }) {
-                            Text("Se connecter")
+                            Text("Se connecter", Modifier, textColor)
                         }
                         /* Button({ corouScope.launch { token = refreshToken(jsonClient, token) } }) {
                         Text("Regénérer le token")
@@ -106,6 +110,7 @@ fun App() {
                                 unfocusedBorderColor = textColor
                             )
                         )
+                        Text("Result : $result", Modifier, textColor)
                     }
                 }
                 AnimatedVisibility(tokenValid) {
@@ -119,7 +124,8 @@ fun App() {
                                     columnEvents.forEach { event ->
                                         Row(
                                             modifier(8, 2, textColor),
-                                            verticalAlignment = Alignment.CenterVertically
+                                            Arrangement.SpaceEvenly,
+                                            Alignment.CenterVertically
                                         ) {
                                             event.name?.let { Text(it, Modifier, textColor) }
                                             event.attendance?.getOrNull(0)?.type?.let { type ->
@@ -141,7 +147,7 @@ fun App() {
                                                     },
                                                     // Modifier,
                                                     colors = buttonColor
-                                                ) { Text(type, Modifier, textColor) }
+                                                ) { Text(type, Modifier, backgroundColor) }
                                             }
                                         }
                                     }

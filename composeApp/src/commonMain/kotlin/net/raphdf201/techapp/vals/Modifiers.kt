@@ -31,6 +31,8 @@ fun modifier(paddingSize: Int): Modifier {
  * - [border]
  */
 fun modifier(paddingSize: Int, borderWidth: Int, borderColor: Color): Modifier {
-    return Modifier.fillMaxWidth().padding(paddingSize.dp)
+    return Modifier
+        .fillMaxWidth()
+        .padding(paddingSize.dp)
         .border(width = borderWidth.dp, borderColor)
 }
