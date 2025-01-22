@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Button
@@ -30,14 +31,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
 import io.ktor.client.HttpClient
-import io.ktor.util.logging.Logger
 import kotlinx.coroutines.launch
 import net.raphdf201.techapp.network.changeAttendance
 import net.raphdf201.techapp.network.fetchEventsText
 import net.raphdf201.techapp.network.fetchGoogle
 import net.raphdf201.techapp.network.invertAttendance
 import net.raphdf201.techapp.network.openUri
-import net.raphdf201.techapp.network.result
+import net.raphdf201.techapp.network.netStatus
 import net.raphdf201.techapp.network.validateToken
 import net.raphdf201.techapp.vals.Event
 import net.raphdf201.techapp.vals.absent
@@ -110,7 +110,7 @@ fun App() {
                                 unfocusedBorderColor = textColor
                             )
                         )
-                        Text("Result : $result", Modifier, textColor)
+                        Text("Status : $netStatus", Modifier, textColor)
                     }
                 }
                 AnimatedVisibility(tokenValid) {
@@ -127,7 +127,7 @@ fun App() {
                                             Arrangement.SpaceEvenly,
                                             Alignment.CenterVertically
                                         ) {
-                                            event.name?.let { Text(it, Modifier, textColor) }
+                                            event.name?.let { Text(it, Modifier.padding(8.dp), textColor) }
                                             event.attendance?.getOrNull(0)?.type?.let { type ->
                                                 val buttonColor: ButtonColors = when (type) {
                                                     present -> ButtonDefaults.buttonColors(Color.Green)
@@ -145,7 +145,7 @@ fun App() {
                                                             }
                                                         }
                                                     },
-                                                    // Modifier,
+                                                    Modifier.padding(1.dp),
                                                     colors = buttonColor
                                                 ) { Text(type, Modifier, backgroundColor) }
                                             }

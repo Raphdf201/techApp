@@ -15,7 +15,7 @@ import net.raphdf201.techapp.vals.absent
 import net.raphdf201.techapp.vals.present
 import net.raphdf201.techapp.vals.techApiHost
 
-var result = ""
+var netStatus = ""
 
 /**
  *  Fetches the events from the API and returns them as a JSON string
@@ -35,7 +35,7 @@ suspend fun fetchEventsText(client: HttpClient, token: String): String {
             append(Authorization, token)
         }
     }
-    result = resp.status.toString()
+    netStatus = resp.status.toString()
     return resp.bodyAsText()
 }
 
@@ -97,7 +97,7 @@ suspend fun validateToken(client: HttpClient, token: String): Boolean {
             append(Authorization, token)
         }
     }
-    result = resp.status.toString()
+    netStatus = resp.status.toString()
     return resp.bodyAsText().split(":")[1].split("}")[0].toBoolean()
 }
 
