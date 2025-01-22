@@ -1,6 +1,7 @@
-package net.raphdf201.techapp
+package net.raphdf201.techapp.network
 
 import androidx.compose.ui.platform.UriHandler
+
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 import io.ktor.client.request.headers
@@ -10,6 +11,11 @@ import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpHeaders.Authorization
 import io.ktor.http.URLProtocol
 import io.ktor.http.path
+import net.raphdf201.techapp.vals.absent
+import net.raphdf201.techapp.vals.present
+import net.raphdf201.techapp.vals.techApiHost
+
+var netStatus = ""
 
 /**
  *  Fetches the events from the API and returns them as a JSON string
@@ -17,7 +23,7 @@ import io.ktor.http.path
  *  @param token the bearer token to use, provided by the [auth/google](api.team3990.com/auth/google) endpoint
  */
 suspend fun fetchEventsText(client: HttpClient, token: String): String {
-    return client.get {
+    val resp = client.get {
         url {
             protocol = URLProtocol.HTTPS
             host = techApiHost
@@ -28,7 +34,9 @@ suspend fun fetchEventsText(client: HttpClient, token: String): String {
         headers {
             append(Authorization, token)
         }
-    }.bodyAsText()
+    }
+    netStatus = resp.status.toString()
+    return resp.bodyAsText()
 }
 
 /**
@@ -79,7 +87,7 @@ fun invertAttendance(attendance: String): String {
  * Validates the token using the [auth/validate](api.team3990.com/auth/validate) endpoint
  */
 suspend fun validateToken(client: HttpClient, token: String): Boolean {
-    return client.post {
+    val resp = client.post {
         url {
             protocol = URLProtocol.HTTPS
             host = techApiHost
@@ -88,7 +96,9 @@ suspend fun validateToken(client: HttpClient, token: String): Boolean {
         headers {
             append(Authorization, token)
         }
-    }.bodyAsText().split(":")[1].split("}")[0].toBoolean()
+    }
+    netStatus = resp.status.toString()
+    return resp.bodyAsText().split(":")[1].split("}")[0].toBoolean()
 }
 
 /**
@@ -113,7 +123,7 @@ suspend fun validateToken(client: HttpClient, token: String): Boolean {
 fun openUri(handler: UriHandler, uri: String) {
     try {
         handler.openUri(uri)
-    } catch (_: IllegalArgumentException) {
+    } catch (error: IllegalArgumentException) {
+        error.printStackTrace()
     }
 }
-
