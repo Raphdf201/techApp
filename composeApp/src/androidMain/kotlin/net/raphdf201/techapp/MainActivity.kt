@@ -12,8 +12,11 @@ private val Context.dataStore by preferencesDataStore("prefs")
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val token = intent?.data?.let { uri ->
+            uri.getQueryParameter("token") ?: ""
+        } ?: ""
         setContent {
-            App(remember { dataStore })
+            App(remember { dataStore }, token)
         }
     }
 }

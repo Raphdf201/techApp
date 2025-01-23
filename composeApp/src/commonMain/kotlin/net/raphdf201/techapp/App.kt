@@ -53,11 +53,11 @@ import net.raphdf201.techapp.vals.present
  * The main composable function for the application
  */
 @Composable
-fun App(prefs: DataStore<Preferences>) {
+fun App(prefs: DataStore<Preferences>, inputToken: String) {
     MaterialTheme {
         var eventsText by remember { mutableStateOf("") }
         var eventsList by remember { mutableStateOf(listOf<Event>()) }
-        var token by remember { mutableStateOf("") }
+        var token by remember { mutableStateOf(inputToken) }
         var tokenValid by remember { mutableStateOf(false) }
         val corouScope = rememberCoroutineScope()
         val dark = isSystemInDarkTheme()
