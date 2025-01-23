@@ -52,17 +52,22 @@ suspend fun fetchGoogle(client: HttpClient): String {
     }.headers["Location"].toString()
 }
 
+/**
+ * Upload the new attendance status to the server
+ */
 suspend fun changeAttendance(client: HttpClient, token: String, eventId: Int, status: String) {
-    client.post {
-        url {
-            protocol = URLProtocol.HTTPS
-            host = techApiHost
-            path("events/attendance")
+    if (status == absent || status == present) {
+        client.post {
+            url {
+                protocol = URLProtocol.HTTPS
+                host = techApiHost
+                path("events/attendance")
+            }
+            headers {
+                append(Authorization, token)
+            }
+            setBody("{\"eventId\":$eventId,\"type\":\"$status\"}")
         }
-        headers {
-            append(Authorization, token)
-        }
-        setBody("{\"eventId\":$eventId,\"type\":\"$status\"}")
     }
 }
 

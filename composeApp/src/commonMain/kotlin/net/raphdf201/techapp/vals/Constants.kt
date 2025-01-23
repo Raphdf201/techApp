@@ -6,6 +6,9 @@ import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 
+/**
+ * The [HttpClient] used to perform any Json requests
+ */
 val jsonClient = HttpClient {
     install(ContentNegotiation) {
         json(Json {
@@ -15,8 +18,16 @@ val jsonClient = HttpClient {
     }
 }
 
+/**
+ * The [Json] parameters used for json serializing
+ */
 val jsonDecoder = Json {
     ignoreUnknownKeys = true
 }
 
+/**
+ * The background [Color] in dark mode
+ *
+ * Triggered by [androidx.compose.foundation.isSystemInDarkTheme]
+ */
 val grey = Color(26, 28, 29)
