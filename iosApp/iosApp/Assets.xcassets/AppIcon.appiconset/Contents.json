@@ -5,6 +5,24 @@
       "idiom": "universal",
       "platform": "ios",
       "size": "900x900"
+    },
+    {
+      "filename": "app-icon-83.jpg",
+      "idiom": "universal",
+      "platform": "ios",
+      "size": "83x83"
+    },
+    {
+      "filename": "app-icon-76.jpg",
+      "idiom": "universal",
+      "platform": "ios",
+      "size": "76x76"
+    },
+    {
+      "filename": "app-icon-60.jpg",
+      "idiom": "universal",
+      "platform": "ios",
+      "size": "60x60"
     }
   ],
   "info": {
