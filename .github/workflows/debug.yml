@@ -1,9 +1,9 @@
-name: Build debug APK
+name: Build debug files
 
 on: push
 
 jobs:
-  Gradle:
+  android:
     runs-on: ubuntu-latest
     steps:
       - name: checkout code
@@ -23,7 +23,7 @@ jobs:
         run: ./gradlew clean build assembleDebug
       - uses: actions/upload-artifact@v4
         with:
-          name: unsigned-debug-mediaplayer
+          name: unsigned-debug-tech
           path: composeApp/build/outputs/apk/debug/composeApp-debug.apk
           if-no-files-found: error
           overwrite: true
