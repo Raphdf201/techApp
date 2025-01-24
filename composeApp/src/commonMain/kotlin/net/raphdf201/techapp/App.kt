@@ -20,6 +20,7 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,17 +32,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
 import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.Preferences
-import androidx.compose.runtime.collectAsState
+import androidx.datastore.preferences.core.stringPreferencesKey
 import io.ktor.client.HttpClient
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import net.raphdf201.techapp.network.changeAttendance
 import net.raphdf201.techapp.network.fetchEventsText
 import net.raphdf201.techapp.network.fetchGoogle
 import net.raphdf201.techapp.network.invertAttendance
 import net.raphdf201.techapp.network.netStatus
+import net.raphdf201.techapp.network.requestCount
 import net.raphdf201.techapp.network.openUri
 import net.raphdf201.techapp.network.validateToken
 import net.raphdf201.techapp.vals.Event
@@ -76,6 +77,7 @@ fun App(prefs: DataStore<Preferences>, inputToken: String) {
         var tokenValid by remember { mutableStateOf(false) }
         var fetchError by remember { mutableStateOf("") }
         var decodeError by remember { mutableStateOf("") }
+        var netResponse by remember { mutableStateOf("") }
         val corouScope = rememberCoroutineScope()
         val dark = isSystemInDarkTheme()
         val uriHandler = LocalUriHandler.current
@@ -100,6 +102,7 @@ fun App(prefs: DataStore<Preferences>, inputToken: String) {
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Button({
+                            requestCount++
                             corouScope.launch {
                                 openUri(
                                     uriHandler,
@@ -110,6 +113,7 @@ fun App(prefs: DataStore<Preferences>, inputToken: String) {
                             Text("Accéder au site", Modifier, textColor)
                         }
                         Button({
+                            requestCount++
                             corouScope.launch {
                                 tokenValid = validateToken(jsonClient, token)
                             }
@@ -132,6 +136,7 @@ fun App(prefs: DataStore<Preferences>, inputToken: String) {
                         Text(netStatus, Modifier, textColor)
                         Text(fetchError, Modifier, textColor)
                         Text(decodeError, Modifier, textColor)
+                        Text("reqs : $requestCount", Modifier, textColor)
                     }
                 }
                 AnimatedVisibility(tokenValid) {
@@ -163,8 +168,9 @@ fun App(prefs: DataStore<Preferences>, inputToken: String) {
                                                 }
                                                 Button(
                                                     {
+                                                        requestCount++
                                                         corouScope.launch {
-                                                            changeAttendance(
+                                                            netResponse = changeAttendance(
                                                                 jsonClient, token,
                                                                 event, invertAttendance(type)
                                                             )
@@ -182,7 +188,10 @@ fun App(prefs: DataStore<Preferences>, inputToken: String) {
                         } else {
                             Text("Aucun évènement", color = textColor)
                         }
-
+                        Text("resp : $netResponse", Modifier, textColor)
+                        Text("fetch : $fetchError", Modifier, textColor)
+                        Text("deco : $decodeError", Modifier, textColor)
+                        Text("reqs : $requestCount", Modifier, textColor)
                     }
                 }
             }
@@ -195,14 +204,16 @@ fun App(prefs: DataStore<Preferences>, inputToken: String) {
             }
         } else if (eventsText == "{\"message\":\"Unauthorized\",\"statusCode\":401}") {
             tokenValid = false
-        }
-        if (tokenValid) {
-            try {
-                corouScope.launch {
-                    eventsText = fetchEventsText(jsonClient, token)
+        } else if (eventsText == "") {
+            if (tokenValid) {
+                requestCount++
+                try {
+                    corouScope.launch {
+                        eventsText = fetchEventsText(jsonClient, token)
+                    }
+                } catch (e: Exception) {
+                    fetchError = e.message.toString()
                 }
-            } catch (e: Exception) {
-                fetchError = e.message.toString()
             }
         }
     }

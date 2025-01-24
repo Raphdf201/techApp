@@ -16,6 +16,7 @@ import net.raphdf201.techapp.vals.present
 import net.raphdf201.techapp.vals.techApiHost
 
 var netStatus = ""
+var requestCount = 0
 
 /**
  *  Fetches the events from the API and returns them as a JSON string
@@ -56,8 +57,8 @@ suspend fun fetchGoogle(client: HttpClient): String {
 /**
  * Upload the new attendance status to the server
  */
-suspend fun changeAttendance(client: HttpClient, token: String, event: Event, status: String) {
-    if (status == absent || status == present) {
+suspend fun changeAttendance(client: HttpClient, token: String, event: Event, status: String): String {
+    return if (status == absent || status == present) {
         client.post {
             url {
                 protocol = URLProtocol.HTTPS
@@ -67,8 +68,10 @@ suspend fun changeAttendance(client: HttpClient, token: String, event: Event, st
             headers {
                 append(Authorization, token)
             }
-            setBody("{\"from\":\"${event.beginDate}\",\"to\":\"${event.endDate}\",\"type\":\"$status\",\"eventId\":${event.id}}")
-        }
+            setBody("{\"eventId\":${event.id},\"from\":\"${event.beginDate}\",\"to\":\"${event.endDate}\",\"type\":\"$status\"}")
+        }.status.toString()
+    } else {
+        ""
     }
 }
 
@@ -129,7 +132,7 @@ suspend fun refreshToken(client: HttpClient, token: String): String {
 fun openUri(handler: UriHandler, uri: String) {
     try {
         handler.openUri(uri)
-    } catch (error: IllegalArgumentException) {
-        error.printStackTrace()
+    } catch (error: Exception) {
+        netStatus = error.message.toString()
     }
 }
