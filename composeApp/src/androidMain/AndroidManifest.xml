@@ -5,8 +5,8 @@
 
     <application
         android:allowBackup="true"
-        android:label="@string/app_name"
         android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@android:style/Theme.Material.Light.NoActionBar">
@@ -20,11 +20,13 @@
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
+
                 <data
-                    android:scheme="techforkids"
-                    android:host="login"/>
+                    android:host="login"
+                    android:scheme="techforkids" />
             </intent-filter>
         </activity>
     </application>

@@ -31,9 +31,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
 import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.Preferences
+import androidx.compose.runtime.collectAsState
 import io.ktor.client.HttpClient
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.map
 import net.raphdf201.techapp.network.changeAttendance
 import net.raphdf201.techapp.network.fetchEventsText
 import net.raphdf201.techapp.network.fetchGoogle
@@ -55,10 +58,24 @@ import net.raphdf201.techapp.vals.present
 @Composable
 fun App(prefs: DataStore<Preferences>, inputToken: String) {
     MaterialTheme {
+        val tokenKey by remember { mutableStateOf(stringPreferencesKey("token")) }
+        var token by remember { mutableStateOf("") }
+        val prefToken by prefs
+            .data
+            .map {
+                it[tokenKey] ?: ""
+            }
+            .collectAsState("")
+        if (inputToken != "") {
+            token = inputToken
+        } else if (prefToken != "") {
+            token = prefToken
+        }
         var eventsText by remember { mutableStateOf("") }
         var eventsList by remember { mutableStateOf(listOf<Event>()) }
-        var token by remember { mutableStateOf(inputToken) }
         var tokenValid by remember { mutableStateOf(false) }
+        var fetchError by remember { mutableStateOf("") }
+        var decodeError by remember { mutableStateOf("") }
         val corouScope = rememberCoroutineScope()
         val dark = isSystemInDarkTheme()
         val uriHandler = LocalUriHandler.current
@@ -112,7 +129,9 @@ fun App(prefs: DataStore<Preferences>, inputToken: String) {
                                 unfocusedBorderColor = textColor
                             )
                         )
-                        Text("Status : $netStatus", Modifier, textColor)
+                        Text(netStatus, Modifier, textColor)
+                        Text(fetchError, Modifier, textColor)
+                        Text(decodeError, Modifier, textColor)
                     }
                 }
                 AnimatedVisibility(tokenValid) {
@@ -145,12 +164,11 @@ fun App(prefs: DataStore<Preferences>, inputToken: String) {
                                                 Button(
                                                     {
                                                         corouScope.launch {
-                                                            event.id?.let { eventId ->
-                                                                changeAttendance(
-                                                                    jsonClient, token,
-                                                                    eventId, invertAttendance(type)
-                                                                )
-                                                            }
+                                                            changeAttendance(
+                                                                jsonClient, token,
+                                                                event, invertAttendance(type)
+                                                            )
+
                                                         }
                                                     },
                                                     Modifier.padding(1.dp),
@@ -170,13 +188,21 @@ fun App(prefs: DataStore<Preferences>, inputToken: String) {
             }
         }
         if (eventsText != "" && eventsText != "{\"message\":\"Unauthorized\",\"statusCode\":401}") {
-            eventsList = jsonDecoder.decodeFromString(eventsText)
+            try {
+                eventsList = jsonDecoder.decodeFromString(eventsText)
+            } catch (e: Exception) {
+                decodeError = e.message.toString()
+            }
         } else if (eventsText == "{\"message\":\"Unauthorized\",\"statusCode\":401}") {
             tokenValid = false
         }
         if (tokenValid) {
-            corouScope.launch {
-                eventsText = fetchEventsText(jsonClient, token)
+            try {
+                corouScope.launch {
+                    eventsText = fetchEventsText(jsonClient, token)
+                }
+            } catch (e: Exception) {
+                fetchError = e.message.toString()
             }
         }
     }

@@ -30,4 +30,4 @@ val jsonDecoder = Json {
  *
  * Triggered by [androidx.compose.foundation.isSystemInDarkTheme]
  */
-val grey = Color(26, 28, 29)
+val grey = Color(30, 31, 34)

@@ -10,6 +10,7 @@ import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpHeaders.Authorization
 import io.ktor.http.URLProtocol
 import io.ktor.http.path
+import net.raphdf201.techapp.vals.Event
 import net.raphdf201.techapp.vals.absent
 import net.raphdf201.techapp.vals.present
 import net.raphdf201.techapp.vals.techApiHost
@@ -55,7 +56,7 @@ suspend fun fetchGoogle(client: HttpClient): String {
 /**
  * Upload the new attendance status to the server
  */
-suspend fun changeAttendance(client: HttpClient, token: String, eventId: Int, status: String) {
+suspend fun changeAttendance(client: HttpClient, token: String, event: Event, status: String) {
     if (status == absent || status == present) {
         client.post {
             url {
@@ -66,7 +67,7 @@ suspend fun changeAttendance(client: HttpClient, token: String, eventId: Int, st
             headers {
                 append(Authorization, token)
             }
-            setBody("{\"eventId\":$eventId,\"type\":\"$status\"}")
+            setBody("{\"from\":\"${event.beginDate}\",\"to\":\"${event.endDate}\",\"type\":\"$status\",\"eventId\":${event.id}}")
         }
     }
 }
@@ -105,10 +106,11 @@ suspend fun validateToken(client: HttpClient, token: String): Boolean {
     return resp.bodyAsText().split(":")[1].split("}")[0].toBoolean()
 }
 
+/*
 /**
  * Refresh the token using the [auth/refresh](api.team3990.com/auth/refresh) endpoint
  */
-/* suspend fun refreshToken(client: HttpClient, token: String): String {
+suspend fun refreshToken(client: HttpClient, token: String): String {
     return bearer + client.post {
         url {
             protocol = URLProtocol.HTTPS
