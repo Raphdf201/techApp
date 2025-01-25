@@ -7,7 +7,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.runtime.remember
 import androidx.datastore.preferences.preferencesDataStore
 
-private val Context.dataStore by preferencesDataStore("prefs")
+// private val Context.dataStore by preferencesDataStore("prefs")
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -16,7 +16,7 @@ class MainActivity : ComponentActivity() {
             uri.getQueryParameter("token") ?: ""
         } ?: ""
         setContent {
-            App(remember { dataStore }, token)
+            App(/*remember { dataStore }, token*/)
         }
     }
 }
