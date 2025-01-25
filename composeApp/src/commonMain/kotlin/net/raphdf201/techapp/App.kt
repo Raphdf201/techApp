@@ -102,13 +102,15 @@ fun App(prefs: DataStore<Preferences>, inputToken: String) {
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Button({
+                            val cli = HttpClient { followRedirects = false }
                             requestCount++
                             corouScope.launch {
                                 openUri(
                                     uriHandler,
-                                    fetchGoogle(HttpClient { followRedirects = false })
+                                    fetchGoogle(cli)
                                 )
                             }
+                            cli.close()
                         }) {
                             Text("Accéder au site", Modifier, textColor)
                         }
@@ -136,7 +138,7 @@ fun App(prefs: DataStore<Preferences>, inputToken: String) {
                         Text(netStatus, Modifier, textColor)
                         Text(fetchError, Modifier, textColor)
                         Text(decodeError, Modifier, textColor)
-                        Text("reqs : $requestCount", Modifier, textColor)
+                        Text(requestCount.toString(), Modifier, textColor)
                     }
                 }
                 AnimatedVisibility(tokenValid) {
