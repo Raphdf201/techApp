@@ -196,6 +196,23 @@ fun App(prefs: DataStore<Preferences>, inputToken: String) {
                         Text("reqs : $requestCount", Modifier, textColor)
                     }
                 }
+                Button({
+                    if (tokenValid) {
+                        requestCount++
+                        try {
+                            corouScope.launch {
+                                eventsText = fetchEventsText(jsonClient, token)
+                            }
+                            eventsList = jsonDecoder.decodeFromString(eventsText)
+                        } catch (e: Exception) {
+                            decodeError = e.message.toString()
+                        }
+                    } else {
+                        fetchError = "Invalid token"
+                    }
+                }, Modifier) {
+                    Text("Refresh", Modifier, textColor)
+                }
             }
         }
         if (eventsText != "" && eventsText != "{\"message\":\"Unauthorized\",\"statusCode\":401}") {
