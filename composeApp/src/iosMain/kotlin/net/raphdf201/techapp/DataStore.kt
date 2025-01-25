@@ -1,4 +1,4 @@
-package net.raphdf201.techapp
+/*package net.raphdf201.techapp
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
@@ -22,3 +22,4 @@ fun createDataStoreIos(): DataStore<Preferences> {
         requireNotNull(directory).path + "/datastore/$DATA_STORE_FILE_NAME"
     }
 }
+*/
