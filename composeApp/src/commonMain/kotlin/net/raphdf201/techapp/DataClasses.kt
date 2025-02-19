@@ -1,4 +1,4 @@
-package net.raphdf201.techapp.vals
+package net.raphdf201.techapp
 
 import kotlinx.serialization.Serializable
 

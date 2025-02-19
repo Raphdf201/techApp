@@ -41,13 +41,10 @@ kotlin {
             implementation(compose.components.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.runtime.compose)
-            implementation(libs.androidx.datastore.preferences)
-            implementation(libs.androidx.datastore)
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.ktor.client.core)
             implementation(libs.ktor.serialization.kotlinx.json)
             implementation(libs.ktor.client.content.negotiation)
-            implementation(libs.multiplatform.settings)
         }
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)

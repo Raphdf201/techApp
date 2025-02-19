@@ -1,4 +1,4 @@
-package net.raphdf201.techapp.vals
+package net.raphdf201.techapp
 
 import androidx.compose.ui.graphics.Color
 import io.ktor.client.HttpClient
@@ -31,3 +31,8 @@ val jsonDecoder = Json {
  * Triggered by [androidx.compose.foundation.isSystemInDarkTheme]
  */
 val grey = Color(30, 31, 34)
+
+/**
+ * Json returned when the token is invalid
+ */
+const val unauthorized = "{\"message\":\"Unauthorized\",\"statusCode\":401}"
