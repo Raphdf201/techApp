@@ -1,4 +1,4 @@
-package net.raphdf201.techapp.network
+package net.raphdf201.techapp
 
 import androidx.compose.ui.platform.UriHandler
 import io.ktor.client.HttpClient
@@ -10,10 +10,6 @@ import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpHeaders.Authorization
 import io.ktor.http.URLProtocol
 import io.ktor.http.path
-import net.raphdf201.techapp.vals.Event
-import net.raphdf201.techapp.vals.absent
-import net.raphdf201.techapp.vals.present
-import net.raphdf201.techapp.vals.techApiHost
 
 var netStatus = ""
 var requestCount = 0

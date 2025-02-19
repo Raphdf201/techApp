@@ -20,7 +20,6 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,54 +30,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.stringPreferencesKey
 import io.ktor.client.HttpClient
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import net.raphdf201.techapp.network.changeAttendance
-import net.raphdf201.techapp.network.fetchEventsText
-import net.raphdf201.techapp.network.fetchGoogle
-import net.raphdf201.techapp.network.invertAttendance
-import net.raphdf201.techapp.network.netStatus
-import net.raphdf201.techapp.network.requestCount
-import net.raphdf201.techapp.network.openUri
-import net.raphdf201.techapp.network.validateToken
-import net.raphdf201.techapp.vals.Event
-import net.raphdf201.techapp.vals.absent
-import net.raphdf201.techapp.vals.grey
-import net.raphdf201.techapp.vals.jsonClient
-import net.raphdf201.techapp.vals.jsonDecoder
-import net.raphdf201.techapp.vals.modifier
-import net.raphdf201.techapp.vals.present
 
 /**
  * The main composable function for the application
  */
 @Composable
-fun App(prefs: DataStore<Preferences>, inputToken: String) {
+fun App() {
     MaterialTheme {
-        val tokenKey by remember { mutableStateOf(stringPreferencesKey("token")) }
         var token by remember { mutableStateOf("") }
-        val prefToken by prefs
-            .data
-            .map {
-                it[tokenKey] ?: ""
-            }
-            .collectAsState("")
-        if (inputToken != "") {
-            token = inputToken
-        } else if (prefToken != "") {
-            token = prefToken
-        }
         var eventsText by remember { mutableStateOf("") }
         var eventsList by remember { mutableStateOf(listOf<Event>()) }
         var tokenValid by remember { mutableStateOf(false) }
         var fetchError by remember { mutableStateOf("") }
         var decodeError by remember { mutableStateOf("") }
         var netResponse by remember { mutableStateOf("") }
-        val corouScope = rememberCoroutineScope()
+        val coroutineScope = rememberCoroutineScope()
         val dark = isSystemInDarkTheme()
         val uriHandler = LocalUriHandler.current
         val backgroundColor: Color
@@ -104,7 +72,7 @@ fun App(prefs: DataStore<Preferences>, inputToken: String) {
                         Button({
                             val cli = HttpClient { followRedirects = false }
                             requestCount++
-                            corouScope.launch {
+                            coroutineScope.launch {
                                 openUri(
                                     uriHandler,
                                     fetchGoogle(cli)
@@ -116,7 +84,7 @@ fun App(prefs: DataStore<Preferences>, inputToken: String) {
                         }
                         Button({
                             requestCount++
-                            corouScope.launch {
+                            coroutineScope.launch {
                                 tokenValid = validateToken(jsonClient, token)
                             }
                         }) {
@@ -171,12 +139,11 @@ fun App(prefs: DataStore<Preferences>, inputToken: String) {
                                                 Button(
                                                     {
                                                         requestCount++
-                                                        corouScope.launch {
+                                                        coroutineScope.launch {
                                                             netResponse = changeAttendance(
                                                                 jsonClient, token,
                                                                 event, invertAttendance(type)
                                                             )
-
                                                         }
                                                     },
                                                     Modifier.padding(1.dp),
@@ -200,7 +167,7 @@ fun App(prefs: DataStore<Preferences>, inputToken: String) {
                     if (tokenValid) {
                         requestCount++
                         try {
-                            corouScope.launch {
+                            coroutineScope.launch {
                                 eventsText = fetchEventsText(jsonClient, token)
                             }
                             eventsList = jsonDecoder.decodeFromString(eventsText)
@@ -215,19 +182,19 @@ fun App(prefs: DataStore<Preferences>, inputToken: String) {
                 }
             }
         }
-        if (eventsText != "" && eventsText != "{\"message\":\"Unauthorized\",\"statusCode\":401}") {
+        if (eventsText != "" && eventsText != unauthorized) {
             try {
                 eventsList = jsonDecoder.decodeFromString(eventsText)
             } catch (e: Exception) {
                 decodeError = e.message.toString()
             }
-        } else if (eventsText == "{\"message\":\"Unauthorized\",\"statusCode\":401}") {
+        } else if (eventsText == unauthorized) {
             tokenValid = false
         } else if (eventsText == "") {
             if (tokenValid) {
                 requestCount++
                 try {
-                    corouScope.launch {
+                    coroutineScope.launch {
                         eventsText = fetchEventsText(jsonClient, token)
                     }
                 } catch (e: Exception) {

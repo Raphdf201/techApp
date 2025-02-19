@@ -1,4 +1,4 @@
-package net.raphdf201.techapp.vals
+package net.raphdf201.techapp
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.fillMaxWidth
