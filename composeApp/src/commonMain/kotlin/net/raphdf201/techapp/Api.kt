@@ -53,7 +53,12 @@ suspend fun fetchGoogle(client: HttpClient): String {
 /**
  * Upload the new attendance status to the server
  */
-suspend fun changeAttendance(client: HttpClient, token: String, event: Event, status: String): String {
+suspend fun changeAttendance(
+    client: HttpClient,
+    token: String,
+    event: Event,
+    status: String
+): String {
     return if (status == absent || status == present) {
         client.post {
             url {
