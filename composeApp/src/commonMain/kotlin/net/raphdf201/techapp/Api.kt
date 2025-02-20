@@ -59,21 +59,17 @@ suspend fun changeAttendance(
     event: Event,
     status: String
 ): String {
-    return if (status == absent || status == present) {
-        client.post {
-            url {
-                protocol = URLProtocol.HTTPS
-                host = techApiHost
-                path("events/attendance")
-            }
-            headers {
-                append(Authorization, token)
-            }
-            setBody("{\"eventId\":${event.id},\"from\":\"${event.beginDate}\",\"to\":\"${event.endDate}\",\"type\":\"$status\"}")
-        }.status.toString()
-    } else {
-        ""
-    }
+    return client.post {
+        url {
+            protocol = URLProtocol.HTTPS
+            host = techApiHost
+            path("events/attendance")
+        }
+        headers {
+            append(Authorization, token)
+        }
+        setBody("{\"eventId\":${event.userAttendance?.id},\"from\":\"${event.beginDate}\",\"to\":\"${event.endDate}\",\"type\":\"$status\"}")
+    }.status.toString()
 }
 
 /**
