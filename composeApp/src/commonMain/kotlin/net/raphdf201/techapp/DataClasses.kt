@@ -89,3 +89,12 @@ data class UserAttendance(
     val markedAt: String?,
     val user: User?
 )
+
+/**
+ * Data class representing a Bearer token set
+ */
+@Serializable
+data class TokenSet(
+    val accessToken: String,
+    val refreshToken: String
+)

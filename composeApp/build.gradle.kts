@@ -43,9 +43,10 @@ kotlin {
             implementation(libs.androidx.lifecycle.runtime.compose)
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.ktor.client.core)
+            implementation(libs.ktor.client.auth)
         }
         iosMain.dependencies {
-            implementation(libs.ktor.client.darwin)
+            implementation(libs.ktor.client.ios)
             implementation(libs.kotlin.stdlib)
         }
     }

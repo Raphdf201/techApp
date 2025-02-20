@@ -12,6 +12,7 @@ import io.ktor.http.HttpHeaders.Authorization
 import io.ktor.http.URLProtocol
 import io.ktor.http.contentType
 import io.ktor.http.path
+import kotlinx.serialization.json.Json
 
 /**
  *  Fetches the events from the API and returns them as a JSON string
@@ -102,12 +103,12 @@ suspend fun validateToken(client: HttpClient, token: String): Boolean {
     }.bodyAsText().split(":")[1].split("}")[0].toBoolean()
 }
 
-/*
+
 /**
  * Refresh the token using the [auth/refresh](api.team3990.com/auth/refresh) endpoint
  */
-suspend fun refreshToken(client: HttpClient, token: String): String {
-    return bearer + client.post {
+suspend fun refreshToken(httpClient: HttpClient, jsonClient: Json, token: String): TokenSet {
+    val resp = bearer + httpClient.post {
         url {
             protocol = URLProtocol.HTTPS
             host = techApiHost
@@ -116,8 +117,9 @@ suspend fun refreshToken(client: HttpClient, token: String): String {
         headers {
             append(Authorization, token)
         }
-    }.bodyAsText().split(":")[1].split("\"")[0]
-} */
+    }.bodyAsText()
+    return jsonClient.decodeFromString(resp)
+}
 
 /**
  * Uses the [UriHandler] to open an URL in the default browser

@@ -32,19 +32,41 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
 import io.ktor.client.HttpClient
+import io.ktor.client.plugins.auth.Auth
+import io.ktor.client.plugins.auth.providers.BearerTokens
+import io.ktor.client.plugins.auth.providers.bearer
 import kotlinx.coroutines.launch
 
 /**
  * The main composable function for the application
  */
 @Composable
-fun App() {
+fun App(token: String = "") {
     MaterialTheme {
-        var token by remember { mutableStateOf("") }
+        var accessToken by remember { mutableStateOf(token) }
+        var refreshToken by remember { mutableStateOf("") }
         var eventsText by remember { mutableStateOf("") }
         var eventsList by remember { mutableStateOf(listOf<Event>()) }
         var tokenValid by remember { mutableStateOf(false) }
-        val client by remember { mutableStateOf(HttpClient()) }
+        val backupClient by remember { mutableStateOf(HttpClient()) }
+        val authClient by remember {
+            mutableStateOf(
+                HttpClient {
+                    install(Auth) {
+                        bearer {
+                            loadTokens {
+                                BearerTokens(accessToken, refreshToken)
+                            }
+                            refreshTokens {
+                                val newTokens =
+                                    refreshToken(backupClient, jsonDecoder, refreshToken)
+                                BearerTokens(newTokens.accessToken, newTokens.refreshToken)
+                            }
+                        }
+                    }
+                }
+            )
+        }
         val coroutineScope = rememberCoroutineScope()
         val dark = isSystemInDarkTheme()
         val uriHandler = LocalUriHandler.current
@@ -73,7 +95,7 @@ fun App() {
                             coroutineScope.launch {
                                 openUri(
                                     uriHandler,
-                                    fetchGoogle(client)
+                                    fetchGoogle(authClient)
                                 )
                             }
                         }) {
@@ -81,21 +103,28 @@ fun App() {
                         }
                         Button({
                             coroutineScope.launch {
-                                tokenValid = validateToken(client, token)
+                                tokenValid = validateToken(authClient, accessToken)
                             }
                         }) {
                             Text("Se connecter", Modifier, textColor)
                         }
-                        /* Button({ corouScope.launch { token = refreshToken(jsonClient, token) } }) {
-                        Text("Regénérer le token")
-                    } */
                         OutlinedTextField(
-                            token,
-                            { token = it },
+                            accessToken,
+                            { accessToken = it },
                             Modifier,
-                            label = { Text("Token", color = textColor) },
+                            label = { Text("Access token", color = textColor) },
                             colors = TextFieldDefaults.outlinedTextFieldColors(
-                                textColor = textColor,
+                                textColor,
+                                unfocusedBorderColor = textColor
+                            )
+                        )
+                        OutlinedTextField(
+                            refreshToken,
+                            { refreshToken = it },
+                            Modifier,
+                            label = { Text("Refresh token", color = textColor) },
+                            colors = TextFieldDefaults.outlinedTextFieldColors(
+                                textColor,
                                 unfocusedBorderColor = textColor
                             )
                         )
@@ -131,15 +160,18 @@ fun App() {
                                                 Button(
                                                     {
                                                         if (tokenValid) {
-                                                        coroutineScope.launch {
-                                                            changeAttendance(
-                                                                client, token,
-                                                                event, invertAttendance(type)
-                                                            )
-                                                        }
+                                                            coroutineScope.launch {
+                                                                changeAttendance(
+                                                                    authClient, accessToken,
+                                                                    event, invertAttendance(type)
+                                                                )
+                                                            }
                                                             coroutineScope.launch {
                                                                 eventsText =
-                                                                    fetchEventsText(client, token)
+                                                                    fetchEventsText(
+                                                                        authClient,
+                                                                        accessToken
+                                                                    )
                                                             }
                                                             eventsList =
                                                                 jsonDecoder.decodeFromString(
@@ -162,10 +194,10 @@ fun App() {
                 }
                 Button({
                     if (tokenValid) {
-                            coroutineScope.launch {
-                                eventsText = fetchEventsText(client, token)
-                            }
-                            eventsList = jsonDecoder.decodeFromString(eventsText)
+                        coroutineScope.launch {
+                            eventsText = fetchEventsText(authClient, accessToken)
+                        }
+                        eventsList = jsonDecoder.decodeFromString(eventsText)
                     }
                 }, Modifier) {
                     Text("Refresh", Modifier, textColor)
@@ -173,14 +205,14 @@ fun App() {
             }
         }
         if (eventsText != "" && eventsText != unauthorized) {
-                eventsList = jsonDecoder.decodeFromString(eventsText)
+            eventsList = jsonDecoder.decodeFromString(eventsText)
         } else if (eventsText == unauthorized) {
             tokenValid = false
         } else if (eventsText == "") {
             if (tokenValid) {
-                    coroutineScope.launch {
-                        eventsText = fetchEventsText(client, token)
-                    }
+                coroutineScope.launch {
+                    eventsText = fetchEventsText(authClient, accessToken)
+                }
             }
         }
     }
