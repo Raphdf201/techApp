@@ -18,13 +18,7 @@ val jsonDecoder = Json {
  */
 val grey = Color(30, 31, 34)
 
-/**
- * Json returned when the token is invalid
- */
 const val unauthorized = "{\"message\":\"Unauthorized\",\"statusCode\":401}"
-
 const val absent = "absent"
-
 const val present = "present"
-
 const val techApiHost = "api.team3990.com"

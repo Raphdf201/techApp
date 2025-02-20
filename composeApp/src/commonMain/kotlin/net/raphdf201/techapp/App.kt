@@ -44,9 +44,6 @@ fun App() {
         var eventsText by remember { mutableStateOf("") }
         var eventsList by remember { mutableStateOf(listOf<Event>()) }
         var tokenValid by remember { mutableStateOf(false) }
-        var fetchError by remember { mutableStateOf("") }
-        var decodeError by remember { mutableStateOf("") }
-        var netResponse by remember { mutableStateOf("") }
         val client by remember { mutableStateOf(HttpClient()) }
         val coroutineScope = rememberCoroutineScope()
         val dark = isSystemInDarkTheme()
@@ -66,26 +63,23 @@ fun App() {
             color = backgroundColor
         ) {
             Column(modifier(), horizontalAlignment = Alignment.CenterHorizontally) {
+                Spacer(Modifier.height(50.dp))
                 AnimatedVisibility(!tokenValid) {
                     Column(
                         modifier(),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Button({
-                            val cli = HttpClient { followRedirects = false }
-                            requestCount++
                             coroutineScope.launch {
                                 openUri(
                                     uriHandler,
-                                    fetchGoogle(cli)
+                                    fetchGoogle(client)
                                 )
                             }
-                            cli.close()
                         }) {
                             Text("Accéder au site", Modifier, textColor)
                         }
                         Button({
-                            requestCount++
                             coroutineScope.launch {
                                 tokenValid = validateToken(client, token)
                             }
@@ -96,19 +90,15 @@ fun App() {
                         Text("Regénérer le token")
                     } */
                         OutlinedTextField(
-                            // Modifier,
                             token,
                             { token = it },
+                            Modifier,
                             label = { Text("Token", color = textColor) },
                             colors = TextFieldDefaults.outlinedTextFieldColors(
                                 textColor = textColor,
                                 unfocusedBorderColor = textColor
                             )
                         )
-                        Text(netStatus, Modifier, textColor)
-                        Text(fetchError, Modifier, textColor)
-                        Text(decodeError, Modifier, textColor)
-                        Text(requestCount.toString(), Modifier, textColor)
                     }
                 }
                 AnimatedVisibility(tokenValid) {
@@ -140,12 +130,21 @@ fun App() {
                                                 }
                                                 Button(
                                                     {
-                                                        requestCount++
+                                                        if (tokenValid) {
                                                         coroutineScope.launch {
-                                                            netResponse = changeAttendance(
+                                                            changeAttendance(
                                                                 client, token,
                                                                 event, invertAttendance(type)
                                                             )
+                                                        }
+                                                            coroutineScope.launch {
+                                                                eventsText =
+                                                                    fetchEventsText(client, token)
+                                                            }
+                                                            eventsList =
+                                                                jsonDecoder.decodeFromString(
+                                                                    eventsText
+                                                                )
                                                         }
                                                     },
                                                     Modifier.padding(1.dp).offset((-6).dp),
@@ -159,26 +158,14 @@ fun App() {
                         } else {
                             Text("Aucun évènement", color = textColor)
                         }
-                        Text("netResponse : $netResponse", Modifier, textColor)
-                        Text("netStatus : $netStatus", Modifier, textColor)
-                        Text("fetchError : $fetchError", Modifier, textColor)
-                        Text("decodeError : $decodeError", Modifier, textColor)
-                        Text("requestCount : $requestCount", Modifier, textColor)
                     }
                 }
                 Button({
                     if (tokenValid) {
-                        requestCount++
-                        //try {
                             coroutineScope.launch {
                                 eventsText = fetchEventsText(client, token)
                             }
                             eventsList = jsonDecoder.decodeFromString(eventsText)
-                        //} catch (e: IllegalArgumentException) {
-                        //    decodeError = e.message.toString()
-                        //}
-                    } else {
-                        fetchError = "Invalid token"
                     }
                 }, Modifier) {
                     Text("Refresh", Modifier, textColor)
@@ -186,23 +173,14 @@ fun App() {
             }
         }
         if (eventsText != "" && eventsText != unauthorized) {
-            //try {
                 eventsList = jsonDecoder.decodeFromString(eventsText)
-            //} catch (e: IllegalArgumentException) {
-            //    decodeError = e.message.toString()
-            //}
         } else if (eventsText == unauthorized) {
             tokenValid = false
         } else if (eventsText == "") {
             if (tokenValid) {
-                requestCount++
-                //try {
                     coroutineScope.launch {
                         eventsText = fetchEventsText(client, token)
                     }
-                //} catch (e: Exception) {
-                //    fetchError = e.message.toString()
-                //}
             }
         }
     }
