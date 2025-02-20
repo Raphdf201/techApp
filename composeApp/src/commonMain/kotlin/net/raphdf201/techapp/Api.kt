@@ -7,12 +7,11 @@ import io.ktor.client.request.headers
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
+import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders.Authorization
 import io.ktor.http.URLProtocol
+import io.ktor.http.contentType
 import io.ktor.http.path
-
-var netStatus = ""
-var requestCount = 0
 
 /**
  *  Fetches the events from the API and returns them as a JSON string
@@ -20,7 +19,7 @@ var requestCount = 0
  *  @param token the bearer token to use, provided by the [auth/google](api.team3990.com/auth/google) endpoint
  */
 suspend fun fetchEventsText(client: HttpClient, token: String): String {
-    val resp = client.get {
+    return client.get {
         url {
             protocol = URLProtocol.HTTPS
             host = techApiHost
@@ -31,9 +30,7 @@ suspend fun fetchEventsText(client: HttpClient, token: String): String {
         headers {
             append(Authorization, token)
         }
-    }
-    netStatus = resp.status.toString()
-    return resp.bodyAsText()
+    }.bodyAsText()
 }
 
 /**
@@ -68,7 +65,8 @@ suspend fun changeAttendance(
         headers {
             append(Authorization, token)
         }
-        setBody("{\"eventId\":${event.userAttendance?.id},\"from\":\"${event.beginDate}\",\"to\":\"${event.endDate}\",\"type\":\"$status\"}")
+        contentType(ContentType.Application.Json)
+        setBody("{\"from\":\"${event.beginDate}\",\"to\":\"${event.endDate}\",\"type\":\"$status\",\"eventId\":${event.id}}")
     }.status.toString()
 }
 
@@ -92,7 +90,7 @@ fun invertAttendance(attendance: String): String {
  * Validates the token using the [auth/validate](api.team3990.com/auth/validate) endpoint
  */
 suspend fun validateToken(client: HttpClient, token: String): Boolean {
-    val resp = client.post {
+    return client.post {
         url {
             protocol = URLProtocol.HTTPS
             host = techApiHost
@@ -101,9 +99,7 @@ suspend fun validateToken(client: HttpClient, token: String): Boolean {
         headers {
             append(Authorization, token)
         }
-    }
-    netStatus = resp.status.toString()
-    return resp.bodyAsText().split(":")[1].split("}")[0].toBoolean()
+    }.bodyAsText().split(":")[1].split("}")[0].toBoolean()
 }
 
 /*
@@ -129,7 +125,7 @@ suspend fun refreshToken(client: HttpClient, token: String): String {
 fun openUri(handler: UriHandler, uri: String) {
     try {
         handler.openUri(uri)
-    } catch (error: Exception) {
-        netStatus = error.message.toString()
+    } catch (error: IllegalArgumentException) {
+        error.printStackTrace()
     }
 }
