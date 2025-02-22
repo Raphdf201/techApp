@@ -4,7 +4,7 @@ on: push
 
 jobs:
   Gradle:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     permissions:
       contents: write
     steps:
@@ -20,7 +20,5 @@ jobs:
         with:
           cache-disabled: false
           add-job-summary: 'on-failure'
-      - name: make Gradle executable
-        run: chmod +x ./gradlew
       - name: build code
-        run: ./gradlew build
+        run: .\gradlew.bat build
