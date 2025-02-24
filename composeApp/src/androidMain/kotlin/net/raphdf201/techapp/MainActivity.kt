@@ -10,6 +10,7 @@ class MainActivity : ComponentActivity() {
         lateinit var instance: MainActivity
             private set
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
