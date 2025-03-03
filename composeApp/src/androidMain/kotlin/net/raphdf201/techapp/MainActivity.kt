@@ -19,14 +19,3 @@ class MainActivity : ComponentActivity() {
         instance = this
     }
 }
-
-actual class Multi {
-    private val file = File(MainActivity.instance.filesDir, "tech")
-    actual fun save(string: String) {
-        file.writeText(string)
-    }
-
-    actual fun load(): String {
-        return file.readText()
-    }
-}

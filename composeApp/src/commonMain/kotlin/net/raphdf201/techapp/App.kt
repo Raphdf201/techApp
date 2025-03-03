@@ -38,9 +38,9 @@ import kotlinx.coroutines.launch
  * The main composable function for the application
  */
 @Composable
-fun App(token: String = "") {
+fun App() {
     MaterialTheme {
-        var accessToken by remember { mutableStateOf(token) }
+        var accessToken by remember { mutableStateOf("") }
         var refreshToken by remember { mutableStateOf("") }
         var eventsText by remember { mutableStateOf("") }
         var eventsList by remember { mutableStateOf(listOf<Event>()) }
