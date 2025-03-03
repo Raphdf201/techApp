@@ -21,6 +21,7 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -40,11 +41,11 @@ import kotlinx.coroutines.launch
 @Composable
 fun App() {
     MaterialTheme {
-        var accessToken by remember { mutableStateOf("") }
-        var refreshToken by remember { mutableStateOf("") }
+        var token by remember { mutableStateOf("") }
         var eventsText by remember { mutableStateOf("") }
         var eventsList by remember { mutableStateOf(listOf<Event>()) }
         var tokenValid by remember { mutableStateOf(false) }
+        var init by remember { mutableStateOf(false) }
         val client by remember { mutableStateOf(HttpClient()) }
         val coroutineScope = rememberCoroutineScope()
         val dark = isSystemInDarkTheme()
@@ -57,6 +58,11 @@ fun App() {
         } else {
             backgroundColor = Color.White
             textColor = Color.Black
+        }
+
+        if (!init) {
+            init = true
+            token = getAccessToken()
         }
 
         Surface(
@@ -82,26 +88,16 @@ fun App() {
                         }
                         Button({
                             coroutineScope.launch {
-                                tokenValid = validateToken(client, accessToken)
+                                tokenValid = validateToken(client, token)
                             }
                         }) {
                             Text("Se connecter", Modifier, textColor)
                         }
                         OutlinedTextField(
-                            accessToken,
-                            { accessToken = it },
+                            token,
+                            { token = it },
                             Modifier,
                             label = { Text("Access token", color = textColor) },
-                            colors = TextFieldDefaults.outlinedTextFieldColors(
-                                textColor,
-                                unfocusedBorderColor = textColor
-                            )
-                        )
-                        OutlinedTextField(
-                            refreshToken,
-                            { refreshToken = it },
-                            Modifier,
-                            label = { Text("Refresh token", color = textColor) },
                             colors = TextFieldDefaults.outlinedTextFieldColors(
                                 textColor,
                                 unfocusedBorderColor = textColor
@@ -141,7 +137,7 @@ fun App() {
                                                         if (tokenValid) {
                                                             coroutineScope.launch {
                                                                 changeAttendance(
-                                                                    client, accessToken,
+                                                                    client, token,
                                                                     event, invertAttendance(type)
                                                                 )
                                                             }
@@ -149,7 +145,7 @@ fun App() {
                                                                 eventsText =
                                                                     fetchEventsText(
                                                                         client,
-                                                                        accessToken
+                                                                        token
                                                                     )
                                                             }
                                                             eventsList =
@@ -174,14 +170,30 @@ fun App() {
                 Button({
                     if (tokenValid) {
                         coroutineScope.launch {
-                            eventsText = fetchEventsText(client, accessToken)
+                            eventsText = fetchEventsText(client, token)
                         }
                         eventsList = jsonDecoder.decodeFromString(eventsText)
                     }
                 }, Modifier) {
                     Text("Refresh", Modifier, textColor)
                 }
+
+                Button({
+                    token = getAccessToken()
+                }, Modifier) {
+                    Text("Load")
+                }
+                Button({
+                    saveAccessToken(token)
+                }, Modifier) {
+                    Text("Save")
+                }
+
+                Text(fileStatus, Modifier, textColor)
             }
+        }
+        if (token == "null") {
+            token = ""
         }
         if (eventsText != "" && eventsText != unauthorized) {
             eventsList = jsonDecoder.decodeFromString(eventsText)
@@ -190,7 +202,7 @@ fun App() {
         } else if (eventsText == "") {
             if (tokenValid) {
                 coroutineScope.launch {
-                    eventsText = fetchEventsText(client, accessToken)
+                    eventsText = fetchEventsText(client, token)
                 }
             }
         }

@@ -1,11 +1,11 @@
 package net.raphdf201.techapp
 
 import android.os.Bundle
-import androidx.activity.ComponentActivity
+import androidx.fragment.app.FragmentActivity
 import androidx.activity.compose.setContent
-import java.io.File
+import com.architect.kmpessentials.KmpAndroid
 
-class MainActivity : ComponentActivity() {
+class MainActivity : FragmentActivity() {
     companion object {
         lateinit var instance: MainActivity
             private set
@@ -17,5 +17,6 @@ class MainActivity : ComponentActivity() {
             App()
         }
         instance = this
+        KmpAndroid.initializeApp(this) {}
     }
 }

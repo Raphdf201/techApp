@@ -30,6 +30,7 @@ kotlin {
     sourceSets {
         androidMain.dependencies {
             implementation(libs.androidx.activity.compose)
+            implementation(libs.androidx.fragment)
             implementation(libs.ktor.client.android)
         }
         commonMain.dependencies {

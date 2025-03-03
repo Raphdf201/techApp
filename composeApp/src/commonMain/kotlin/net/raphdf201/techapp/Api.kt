@@ -103,24 +103,6 @@ suspend fun validateToken(client: HttpClient, token: String): Boolean {
     }.bodyAsText().split(":")[1].split("}")[0].toBoolean()
 }
 
-
-/**
- * Refresh the token using the [auth/refresh](api.team3990.com/auth/refresh) endpoint
- */
-suspend fun refreshToken(httpClient: HttpClient, jsonClient: Json, token: String): TokenSet {
-    val resp = bearer + httpClient.post {
-        url {
-            protocol = URLProtocol.HTTPS
-            host = techApiHost
-            path("auth/refresh")
-        }
-        headers {
-            append(Authorization, token)
-        }
-    }.bodyAsText()
-    return jsonClient.decodeFromString(resp)
-}
-
 /**
  * Uses the [UriHandler] to open an URL in the default browser
  */
