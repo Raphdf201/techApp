@@ -1,12 +1,10 @@
-name: Gradle tasks
+name: Build release apk
 
-on: push
+on: release
 
 jobs:
-  Gradle:
+  apk:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     steps:
       - name: checkout code
         uses: actions/checkout@v4
@@ -19,6 +17,11 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
         with:
           cache-disabled: false
-          add-job-summary: 'on-failure'
-      - name: build code
-        run: ./gradlew build
+      - name: Build Release APK
+        run: ./gradlew assembleRelease
+      - uses: actions/upload-artifact@v4
+        with:
+          name: unsigned-release-tech
+          path: composeApp/build/outputs/apk/release/composeApp-release.apk
+          if-no-files-found: error
+          overwrite: true

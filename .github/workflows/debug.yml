@@ -1,9 +1,9 @@
-name: Build debug files
+name: Build debug apk
 
 on: push
 
 jobs:
-  android:
+  apk:
     runs-on: ubuntu-latest
     steps:
       - name: checkout code
@@ -18,7 +18,7 @@ jobs:
         with:
           cache-disabled: false
       - name: Build Release APK
-        run: ./gradlew clean build assembleDebug
+        run: ./gradlew assembleDebug
       - uses: actions/upload-artifact@v4
         with:
           name: unsigned-debug-tech
