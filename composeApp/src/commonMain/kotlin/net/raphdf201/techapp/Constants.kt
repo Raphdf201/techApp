@@ -1,6 +1,7 @@
 package net.raphdf201.techapp
 
 import androidx.compose.ui.graphics.Color
+import com.architect.kmpessentials.fileSystem.KmpFileSystem
 import kotlinx.serialization.json.Json
 
 /**
@@ -23,3 +24,4 @@ const val absent = "absent"
 const val present = "present"
 const val bearer = "Bearer "
 const val techApiHost = "api.team3990.com"
+val dir = KmpFileSystem.getAppDirectory() + "tech"
