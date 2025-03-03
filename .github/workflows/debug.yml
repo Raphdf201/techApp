@@ -4,7 +4,7 @@ on: push
 
 jobs:
   android:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - name: checkout code
         uses: actions/checkout@v4
@@ -18,7 +18,7 @@ jobs:
         with:
           cache-disabled: false
       - name: Build Release APK
-        run: .\gradlew.bat clean build assembleDebug
+        run: ./gradlew clean build assembleDebug
       - uses: actions/upload-artifact@v4
         with:
           name: unsigned-debug-tech
