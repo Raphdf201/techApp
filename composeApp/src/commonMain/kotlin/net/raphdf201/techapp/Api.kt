@@ -12,7 +12,6 @@ import io.ktor.http.HttpHeaders.Authorization
 import io.ktor.http.URLProtocol
 import io.ktor.http.contentType
 import io.ktor.http.path
-import kotlinx.serialization.json.Json
 
 /**
  *  Fetches the events from the API and returns them as a JSON string
@@ -46,6 +45,19 @@ suspend fun fetchGoogle(client: HttpClient): String {
             path("auth/google")
         }
     }.headers["Location"].toString()
+}
+
+suspend fun fetchUser(client: HttpClient, token: String): String {
+    return client.get {
+        url {
+            protocol = URLProtocol.HTTPS
+            host = techApiHost
+            path("users/me")
+        }
+        headers {
+            append(Authorization, token)
+        }
+    }.bodyAsText()
 }
 
 /**
@@ -83,6 +95,7 @@ fun invertAttendance(attendance: String): String {
     return when (attendance) {
         absent -> present
         present -> absent
+        waiting -> waiting
         else -> ""
     }
 }

@@ -21,7 +21,6 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -44,6 +43,7 @@ fun App() {
         var token by remember { mutableStateOf("") }
         var eventsText by remember { mutableStateOf("") }
         var eventsList by remember { mutableStateOf(listOf<Event>()) }
+        var me by remember { mutableStateOf(listOf<User>()) }
         var tokenValid by remember { mutableStateOf(false) }
         var init by remember { mutableStateOf(false) }
         val client by remember { mutableStateOf(HttpClient()) }
@@ -52,6 +52,7 @@ fun App() {
         val uriHandler = LocalUriHandler.current
         val backgroundColor: Color
         val textColor: Color
+
         if (dark) {
             backgroundColor = grey
             textColor = Color.White
@@ -63,6 +64,9 @@ fun App() {
         if (!init) {
             init = true
             token = getAccessToken()
+            coroutineScope.launch {
+
+            }
         }
 
         Surface(
@@ -72,10 +76,7 @@ fun App() {
             Column(modifier(), horizontalAlignment = Alignment.CenterHorizontally) {
                 Spacer(Modifier.height(50.dp))
                 AnimatedVisibility(!tokenValid) {
-                    Column(
-                        modifier(),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
+                    Column(modifier(), horizontalAlignment = Alignment.CenterHorizontally) {
                         Button({
                             coroutineScope.launch {
                                 openUri(
@@ -126,11 +127,12 @@ fun App() {
                                                     textColor
                                                 )
                                             }
-                                            event.attendance?.getOrNull(0)?.type?.let { type ->
+                                            event.userAttendance?.type?.let { type ->
                                                 val buttonColor: ButtonColors = when (type) {
                                                     present -> ButtonDefaults.buttonColors(Color.Green)
                                                     absent -> ButtonDefaults.buttonColors(Color.Red)
-                                                    else -> ButtonDefaults.buttonColors(Color.Yellow)
+                                                    waiting -> ButtonDefaults.buttonColors(Color.Yellow)
+                                                    else -> ButtonDefaults.buttonColors(Color.Gray)
                                                 }
                                                 Button(
                                                     {
@@ -140,8 +142,6 @@ fun App() {
                                                                     client, token,
                                                                     event, invertAttendance(type)
                                                                 )
-                                                            }
-                                                            coroutineScope.launch {
                                                                 eventsText =
                                                                     fetchEventsText(
                                                                         client,
@@ -189,6 +189,7 @@ fun App() {
                     Text("Save")
                 }
 
+                Text(dir, Modifier, textColor)
                 Text(fileStatus, Modifier, textColor)
             }
         }
@@ -204,6 +205,12 @@ fun App() {
                 coroutineScope.launch {
                     eventsText = fetchEventsText(client, token)
                 }
+            }
+        }
+
+        if (me.isEmpty()) {
+            coroutineScope.launch {
+                me = jsonDecoder.decodeFromString(fetchUser(client, token))
             }
         }
     }

@@ -22,6 +22,7 @@ val grey = Color(30, 31, 34)
 const val unauthorized = "{\"message\":\"Unauthorized\",\"statusCode\":401}"
 const val absent = "absent"
 const val present = "present"
+const val waiting = "waiting"
 const val bearer = "Bearer "
 const val techApiHost = "api.team3990.com"
 val dir = "${KmpFileSystem.getAppDirectory()}/tech"
