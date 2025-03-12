@@ -63,10 +63,6 @@ fun App() {
 
         if (!init) {
             init = true
-            token = getAccessToken()
-            coroutineScope.launch {
-
-            }
         }
 
         Surface(
@@ -78,6 +74,7 @@ fun App() {
                 AnimatedVisibility(!tokenValid) {
                     Column(modifier(), horizontalAlignment = Alignment.CenterHorizontally) {
                         Button({
+                            networkLog("fetching google link")
                             coroutineScope.launch {
                                 openUri(
                                     uriHandler,
@@ -88,6 +85,7 @@ fun App() {
                             Text("Accéder au site", Modifier, textColor)
                         }
                         Button({
+                            networkLog("validating token")
                             coroutineScope.launch {
                                 tokenValid = validateToken(client, token)
                             }
@@ -137,6 +135,8 @@ fun App() {
                                                 Button(
                                                     {
                                                         if (tokenValid) {
+                                                            networkLog("changing attendance status")
+                                                            networkLog("fetching events")
                                                             coroutineScope.launch {
                                                                 changeAttendance(
                                                                     client, token,
@@ -148,6 +148,7 @@ fun App() {
                                                                         token
                                                                     )
                                                             }
+                                                            serializationLog("decoding events")
                                                             eventsList =
                                                                 jsonDecoder.decodeFromString(
                                                                     eventsText
@@ -169,47 +170,38 @@ fun App() {
                 }
                 Button({
                     if (tokenValid) {
+                        networkLog("fetching events")
                         coroutineScope.launch {
                             eventsText = fetchEventsText(client, token)
                         }
+                        serializationLog("decoding events")
                         eventsList = jsonDecoder.decodeFromString(eventsText)
                     }
                 }, Modifier) {
                     Text("Refresh", Modifier, textColor)
                 }
-
-                Button({
-                    token = getAccessToken()
-                }, Modifier) {
-                    Text("Load")
-                }
-                Button({
-                    saveAccessToken(token)
-                }, Modifier) {
-                    Text("Save")
-                }
-
-                Text(dir, Modifier, textColor)
-                Text(fileStatus, Modifier, textColor)
             }
         }
         if (token == "null") {
             token = ""
         }
         if (eventsText != "" && eventsText != unauthorized) {
+            serializationLog("decoding events")
             eventsList = jsonDecoder.decodeFromString(eventsText)
         } else if (eventsText == unauthorized) {
             tokenValid = false
         } else if (eventsText == "") {
             if (tokenValid) {
+                networkLog("fetching events")
                 coroutineScope.launch {
                     eventsText = fetchEventsText(client, token)
                 }
             }
         }
 
-        if (me.isEmpty()) {
+        if (me.isEmpty() && tokenValid) {
             coroutineScope.launch {
+                serializationLog("decoding user info")
                 me = jsonDecoder.decodeFromString(fetchUser(client, token))
             }
         }

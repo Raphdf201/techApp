@@ -32,6 +32,7 @@ kotlin {
             implementation(libs.androidx.activity.compose)
             implementation(libs.androidx.fragment)
             implementation(libs.ktor.client.android)
+            implementation(libs.squareup.logcat)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
