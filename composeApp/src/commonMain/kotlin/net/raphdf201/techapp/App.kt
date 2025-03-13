@@ -172,7 +172,7 @@ fun App() {
                     }
                 }, Modifier) {
                     Text("Refresh", Modifier, textColor)
-                } S
+                }
             }
         }
         if (token == "null") {
