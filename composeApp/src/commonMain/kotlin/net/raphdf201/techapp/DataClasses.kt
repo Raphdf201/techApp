@@ -8,19 +8,19 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class Event(
     val id: Int,
-    val name: String?,
+    val name: String,
     val description: String?,
     val location: String?,
-    val beginDate: String?,
-    val endDate: String?,
+    val beginDate: String,
+    val endDate: String,
     val status: String?,
     val equipe: String?,
     val maxParticipants: Int?,
     val creator: Creator?,
-    val attendance: List<Attendance>?,
-    val invitations: List<Invitation>?,
+    val attendance: List<Attendance>,
+    val invitations: List<Invitation>,
     val full: Boolean?,
-    val userAttendance: UserAttendance?
+    val userAttendance: UserAttendance
 )
 
 /**
@@ -46,14 +46,14 @@ data class Attendance(
  * Data class representing the invitation to an [Event]
  */
 @Serializable
-data class Invitation(val id: Int?, val user: User?)
+data class Invitation(val id: Int, val user: User)
 
 /**
  * Data class representing a user
  */
 @Serializable
 data class User(
-    val id: Int?,
+    val id: Int,
     val completeName: String?,
     val avatar: String?,
     val role: String?,
@@ -83,7 +83,7 @@ data class User(
 @Serializable
 data class UserAttendance(
     val id: Int?,
-    val type: String?,
+    val type: String,
     val from: String?,
     val to: String?,
     val markedAt: String?,

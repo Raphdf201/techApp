@@ -9,3 +9,7 @@ fun networkLog(message: String) {
 fun serializationLog(message: String) {
     log(message, "serialization")
 }
+
+fun exceptionLog(exception: Exception) {
+    log(exception.message.toString(), "errors")
+}

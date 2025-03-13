@@ -14,7 +14,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonColors
-import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Surface
@@ -118,20 +117,14 @@ fun App() {
                                             Arrangement.SpaceBetween,
                                             Alignment.CenterVertically
                                         ) {
-                                            event.name?.let {
-                                                Text(
-                                                    it,
-                                                    Modifier.padding(8.dp),
-                                                    textColor
-                                                )
-                                            }
-                                            event.userAttendance?.type?.let { type ->
-                                                val buttonColor: ButtonColors = when (type) {
-                                                    present -> ButtonDefaults.buttonColors(Color.Green)
-                                                    absent -> ButtonDefaults.buttonColors(Color.Red)
-                                                    waiting -> ButtonDefaults.buttonColors(Color.Yellow)
-                                                    else -> ButtonDefaults.buttonColors(Color.Gray)
-                                                }
+                                            Text(
+                                                event.name,
+                                                Modifier.padding(8.dp),
+                                                textColor
+                                            )
+                                            event.userAttendance.type.let { type ->
+                                                val buttonColor: ButtonColors =
+                                                    getButtonColor(me[0], event)
                                                 Button(
                                                     {
                                                         if (tokenValid) {
@@ -179,7 +172,7 @@ fun App() {
                     }
                 }, Modifier) {
                     Text("Refresh", Modifier, textColor)
-                }
+                } S
             }
         }
         if (token == "null") {

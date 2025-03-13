@@ -38,13 +38,18 @@ suspend fun fetchEventsText(client: HttpClient, token: String): String {
  *  @param client the ktor client to use
  */
 suspend fun fetchGoogle(client: HttpClient): String {
-    return client.get {
-        url {
-            protocol = URLProtocol.HTTPS
-            host = techApiHost
-            path("auth/google")
-        }
-    }.headers["Location"].toString()
+    return try {
+        client.get {
+            url {
+                protocol = URLProtocol.HTTPS
+                host = techApiHost
+                path("auth/google")
+            }
+        }.headers["Location"].toString()
+    } catch (e: Exception) {
+        exceptionLog(e)
+        "https://raphdf.ddns.net/tech/errors/fetchGoogle.html"
+    }
 }
 
 suspend fun fetchUser(client: HttpClient, token: String): String {
@@ -104,16 +109,21 @@ fun invertAttendance(attendance: String): String {
  * Validates the token using the [auth/validate](api.team3990.com/auth/validate) endpoint
  */
 suspend fun validateToken(client: HttpClient, token: String): Boolean {
-    return client.post {
-        url {
-            protocol = URLProtocol.HTTPS
-            host = techApiHost
-            path("auth/validate")
-        }
-        headers {
-            append(Authorization, token)
-        }
-    }.bodyAsText().split(":")[1].split("}")[0].toBoolean()
+    return try {
+        client.post {
+            url {
+                protocol = URLProtocol.HTTPS
+                host = techApiHost
+                path("auth/validate")
+            }
+            headers {
+                append(Authorization, token)
+            }
+        }.bodyAsText().split(":")[1].split("}")[0].toBoolean()
+    } catch (e: Exception) {
+        exceptionLog(e)
+        false
+    }
 }
 
 /**
@@ -122,7 +132,7 @@ suspend fun validateToken(client: HttpClient, token: String): Boolean {
 fun openUri(handler: UriHandler, uri: String) {
     try {
         handler.openUri(uri)
-    } catch (error: IllegalArgumentException) {
-        error.printStackTrace()
+    } catch (e: Exception) {
+        exceptionLog(e)
     }
 }
