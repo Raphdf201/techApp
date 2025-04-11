@@ -36,7 +36,7 @@ import kotlinx.coroutines.runBlocking
  * The main composable function for the application
  */
 @Composable
-fun App() {
+fun App(tkn: String = "") {
     MaterialTheme {
         var token by remember { mutableStateOf("") }
         var eventsText by remember { mutableStateOf("") }
@@ -59,6 +59,7 @@ fun App() {
         }
 
         if (!init) {
+            token = if (tkn == "") get1() else tkn
             init = true
         }
 
@@ -86,6 +87,7 @@ fun App() {
                             runBlocking {
                                 tokenValid = validateToken(client, token)
                             }
+                            if (tokenValid) store1(token)
                         }) {
                             Text("Se connecter", Modifier, textColor)
                         }
@@ -204,7 +206,6 @@ fun App() {
                 }
             }
         }
-
         if (me.isEmpty() && tokenValid) {
             runBlocking {
                 serializationLog("decoding user info")
