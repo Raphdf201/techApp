@@ -1,0 +1,2 @@
+https://raphdf.ddns.net/.well-known/assetlinks.json
+keytool -list -v -keystore my-release-key.keystore
