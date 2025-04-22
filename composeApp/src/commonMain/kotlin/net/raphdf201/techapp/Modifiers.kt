@@ -36,3 +36,7 @@ fun modifier(paddingSize: Int, borderWidth: Int, borderColor: Color): Modifier {
         .padding(paddingSize.dp)
         .border(width = borderWidth.dp, borderColor)
 }
+
+fun list(str: String): String {
+    return "[$str]"
+}

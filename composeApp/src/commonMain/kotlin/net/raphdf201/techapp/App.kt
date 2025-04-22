@@ -124,7 +124,7 @@ fun App() {
                                             )
                                             event.userAttendance.type.let { type ->
                                                 val buttonColor: ButtonColors =
-                                                    getButtonColor(me[0], event)
+                                                    getButtonColor(me, event)
                                                 Button(
                                                     {
                                                         if (tokenValid) {
@@ -195,7 +195,7 @@ fun App() {
         if (me.isEmpty() && tokenValid) {
             coroutineScope.launch {
                 serializationLog("decoding user info")
-                me = jsonDecoder.decodeFromString(fetchUser(client, token))
+                me = jsonDecoder.decodeFromString(list(fetchUser(client, token)))
             }
         }
     }

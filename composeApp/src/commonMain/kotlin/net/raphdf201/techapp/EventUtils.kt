@@ -15,14 +15,16 @@ fun userInEvent(user: User, event: Event): Boolean {
 }
 
 @Composable
-fun getButtonColor(user: User, event: Event): ButtonColors {
-    val type = event.userAttendance.type
-    if (userInEvent(user, event) && (type == waiting)) {
-        return ButtonDefaults.buttonColors(Color.Yellow)
-    } else if (type == present) {
-        return ButtonDefaults.buttonColors(Color.Green)
-    } else if (type == absent) {
-        return ButtonDefaults.buttonColors(Color.Red)
+fun getButtonColor(user: List<User>, event: Event): ButtonColors {
+    if (user.isNotEmpty()) {
+        val type = event.userAttendance.type
+        if (userInEvent(user[0], event) && (type == waiting)) {
+            return ButtonDefaults.buttonColors(Color.Yellow)
+        } else if (type == present) {
+            return ButtonDefaults.buttonColors(Color.Green)
+        } else if (type == absent) {
+            return ButtonDefaults.buttonColors(Color.Red)
+        }
     }
     return ButtonDefaults.buttonColors(Color.Gray)
 }
