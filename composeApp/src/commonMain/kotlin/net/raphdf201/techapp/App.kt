@@ -124,7 +124,7 @@ fun App(tkn: String = "") {
                                             )
                                             event.userAttendance.type.let { type ->
                                                 val buttonColor: ButtonColors =
-                                                    getButtonColor(me[0], event)
+                                                    getButtonColor(me, event)
                                                 Button(
                                                     {
                                                         if (tokenValid) {
