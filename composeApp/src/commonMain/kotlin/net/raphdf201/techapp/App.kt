@@ -23,7 +23,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,13 +30,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
 import io.ktor.client.HttpClient
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 /**
  * The main composable function for the application
  */
 @Composable
-fun App() {
+fun App(tkn: String = "") {
     MaterialTheme {
         var token by remember { mutableStateOf("") }
         var eventsText by remember { mutableStateOf("") }
@@ -46,7 +45,6 @@ fun App() {
         var tokenValid by remember { mutableStateOf(false) }
         var init by remember { mutableStateOf(false) }
         val client by remember { mutableStateOf(HttpClient()) }
-        val coroutineScope = rememberCoroutineScope()
         val dark = isSystemInDarkTheme()
         val uriHandler = LocalUriHandler.current
         val backgroundColor: Color
@@ -61,6 +59,7 @@ fun App() {
         }
 
         if (!init) {
+            token = if (tkn == "") get1() else tkn
             init = true
         }
 
@@ -74,7 +73,7 @@ fun App() {
                     Column(modifier(), horizontalAlignment = Alignment.CenterHorizontally) {
                         Button({
                             networkLog("fetching google link")
-                            coroutineScope.launch {
+                            runBlocking {
                                 openUri(
                                     uriHandler,
                                     fetchGoogle(client)
@@ -85,9 +84,10 @@ fun App() {
                         }
                         Button({
                             networkLog("validating token")
-                            coroutineScope.launch {
+                            runBlocking {
                                 tokenValid = validateToken(client, token)
                             }
+                            if (tokenValid) store1(token)
                         }) {
                             Text("Se connecter", Modifier, textColor)
                         }
@@ -124,13 +124,13 @@ fun App() {
                                             )
                                             event.userAttendance.type.let { type ->
                                                 val buttonColor: ButtonColors =
-                                                    getButtonColor(me, event)
+                                                    getButtonColor(me[0], event)
                                                 Button(
                                                     {
                                                         if (tokenValid) {
                                                             networkLog("changing attendance status")
                                                             networkLog("fetching events")
-                                                            coroutineScope.launch {
+                                                            runBlocking {
                                                                 changeAttendance(
                                                                     client, token,
                                                                     event, invertAttendance(type)
@@ -142,10 +142,15 @@ fun App() {
                                                                     )
                                                             }
                                                             serializationLog("decoding events")
-                                                            eventsList =
-                                                                jsonDecoder.decodeFromString(
-                                                                    eventsText
-                                                                )
+                                                            try {
+                                                                eventsList =
+                                                                    jsonDecoder.decodeFromString(
+                                                                        eventsText
+                                                                    )
+                                                            } catch (e: Exception) {
+                                                                serializationLog("Error while decoding events error : ${e.message}")
+                                                                serializationLog("Error while decoding events text : $eventsText")
+                                                            }
                                                         }
                                                     },
                                                     Modifier.padding(1.dp).offset((-6).dp),
@@ -164,11 +169,16 @@ fun App() {
                 Button({
                     if (tokenValid) {
                         networkLog("fetching events")
-                        coroutineScope.launch {
+                        runBlocking {
                             eventsText = fetchEventsText(client, token)
                         }
                         serializationLog("decoding events")
-                        eventsList = jsonDecoder.decodeFromString(eventsText)
+                        try {
+                            eventsList = jsonDecoder.decodeFromString(eventsText)
+                        } catch (e: Exception) {
+                            serializationLog("Error while decoding events error : ${e.message}")
+                            serializationLog("Error while decoding events text : $eventsText")
+                        }
                     }
                 }, Modifier) {
                     Text("Refresh", Modifier, textColor)
@@ -180,22 +190,32 @@ fun App() {
         }
         if (eventsText != "" && eventsText != unauthorized) {
             serializationLog("decoding events")
-            eventsList = jsonDecoder.decodeFromString(eventsText)
+            try {
+                eventsList = jsonDecoder.decodeFromString(eventsText)
+            } catch (e: Exception) {
+                serializationLog("Error while decoding events error : ${e.message}")
+                serializationLog("Error while decoding events text : $eventsText")
+            }
         } else if (eventsText == unauthorized) {
             tokenValid = false
         } else if (eventsText == "") {
             if (tokenValid) {
                 networkLog("fetching events")
-                coroutineScope.launch {
+                runBlocking {
                     eventsText = fetchEventsText(client, token)
                 }
             }
         }
-
         if (me.isEmpty() && tokenValid) {
-            coroutineScope.launch {
+            runBlocking {
                 serializationLog("decoding user info")
-                me = jsonDecoder.decodeFromString(list(fetchUser(client, token)))
+                val userText = "[${fetchUser(client, token)}]"
+                try {
+                    me = jsonDecoder.decodeFromString(userText)
+                } catch (e: Exception) {
+                    serializationLog("Error while decoding user error : ${e.message}")
+                    serializationLog("Error while decoding user text : $userText")
+                }
             }
         }
     }
