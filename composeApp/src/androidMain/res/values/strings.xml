@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">techApp</string>
+    <string name="domain">raphdf.ddns.net</string>
 </resources>

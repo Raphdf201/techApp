@@ -38,7 +38,6 @@ import kotlinx.coroutines.runBlocking
 @Composable
 fun App(tkn: String = "") {
     MaterialTheme {
-        var token by remember { mutableStateOf("") }
         var eventsText by remember { mutableStateOf("") }
         var eventsList by remember { mutableStateOf(listOf<Event>()) }
         var me by remember { mutableStateOf(listOf<User>()) }
@@ -59,7 +58,7 @@ fun App(tkn: String = "") {
         }
 
         if (!init) {
-            token = if (tkn == "") get1() else tkn
+            accessToken = if (tkn == "") get1() else tkn
             init = true
         }
 
@@ -85,15 +84,15 @@ fun App(tkn: String = "") {
                         Button({
                             networkLog("validating token")
                             runBlocking {
-                                tokenValid = validateToken(client, token)
+                                tokenValid = validateToken(client, accessToken)
                             }
-                            if (tokenValid) store1(token)
+                            if (tokenValid) store1(accessToken)
                         }) {
                             Text("Se connecter", Modifier, textColor)
                         }
                         OutlinedTextField(
-                            token,
-                            { token = it },
+                            accessToken,
+                            { accessToken = it },
                             Modifier,
                             label = { Text("Access token", color = textColor) },
                             colors = TextFieldDefaults.outlinedTextFieldColors(
@@ -132,13 +131,13 @@ fun App(tkn: String = "") {
                                                             networkLog("fetching events")
                                                             runBlocking {
                                                                 changeAttendance(
-                                                                    client, token,
+                                                                    client, accessToken,
                                                                     event, invertAttendance(type)
                                                                 )
                                                                 eventsText =
                                                                     fetchEventsText(
                                                                         client,
-                                                                        token
+                                                                        accessToken
                                                                     )
                                                             }
                                                             serializationLog("decoding events")
@@ -170,7 +169,7 @@ fun App(tkn: String = "") {
                     if (tokenValid) {
                         networkLog("fetching events")
                         runBlocking {
-                            eventsText = fetchEventsText(client, token)
+                            eventsText = fetchEventsText(client, accessToken)
                         }
                         serializationLog("decoding events")
                         try {
@@ -185,8 +184,8 @@ fun App(tkn: String = "") {
                 }
             }
         }
-        if (token == "null") {
-            token = ""
+        if (accessToken == "null") {
+            accessToken = ""
         }
         if (eventsText != "" && eventsText != unauthorized) {
             serializationLog("decoding events")
@@ -202,14 +201,14 @@ fun App(tkn: String = "") {
             if (tokenValid) {
                 networkLog("fetching events")
                 runBlocking {
-                    eventsText = fetchEventsText(client, token)
+                    eventsText = fetchEventsText(client, accessToken)
                 }
             }
         }
         if (me.isEmpty() && tokenValid) {
             runBlocking {
                 serializationLog("decoding user info")
-                val userText = "[${fetchUser(client, token)}]"
+                val userText = "[${fetchUser(client, accessToken)}]"
                 try {
                     me = jsonDecoder.decodeFromString(userText)
                 } catch (e: Exception) {

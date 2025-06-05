@@ -1,17 +1,16 @@
 [versions]
 agp = "8.10.0"
-androidx-activityCompose = "1.10.0"
+androidx-activityCompose = "1.10.1"
 androidx-lifecycle = "2.9.0"
-androidx-fragment = "1.8.6"
+androidx-fragment = "1.8.8"
 compose-multiplatform = "1.8.1"
 dokka = "2.0.0"
 kmpessentials = "2.3.2"
 kotlin = "2.1.21"
 kotlinxSerializationJson = "1.8.1"
 ktor = "3.1.3"
-material3Android = "1.3.1"
-logcat = "0.2.1"
-uiTextGoogleFonts = "1.7.8"
+logcat = "0.2.3"
+uiTextGoogleFonts = "1.8.2"
 
 [libraries]
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
@@ -25,7 +24,6 @@ ktor-client-android = { module = "io.ktor:ktor-client-android", version.ref = "k
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
 ktor-client-auth = { module = "io.ktor:ktor-client-auth", version.ref = "ktor" }
 ktor-client-ios = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor" }
-androidx-material3-android = { group = "androidx.compose.material3", name = "material3-android", version.ref = "material3Android" }
 squareup-logcat = { module = "com.squareup.logcat:logcat", version.ref = "logcat" }
 androidx-ui-text-google-fonts = { group = "androidx.compose.ui", name = "ui-text-google-fonts", version.ref = "uiTextGoogleFonts" }
 
