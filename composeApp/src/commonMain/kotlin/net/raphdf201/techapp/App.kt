@@ -39,6 +39,8 @@ import kotlinx.coroutines.runBlocking
 fun App(tkn: String = "") {
     MaterialTheme {
         var eventsText by remember { mutableStateOf("") }
+        var accessToken by remember { mutableStateOf("") }
+        var refreshToken by remember { mutableStateOf("") }
         var eventsList by remember { mutableStateOf(listOf<Event>()) }
         var me by remember { mutableStateOf(listOf<User>()) }
         var tokenValid by remember { mutableStateOf(false) }
@@ -89,6 +91,12 @@ fun App(tkn: String = "") {
                             if (tokenValid) store1(accessToken)
                         }) {
                             Text("Se connecter", Modifier, textColor)
+                        }
+                        Button({
+                            accessToken = ""
+                            refreshToken = ""
+                        }) {
+                            Text("Se déconnecter", Modifier, textColor)
                         }
                         OutlinedTextField(
                             accessToken,

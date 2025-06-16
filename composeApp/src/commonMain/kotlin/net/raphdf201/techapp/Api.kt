@@ -9,9 +9,7 @@ import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders.Authorization
-import io.ktor.http.URLProtocol
 import io.ktor.http.contentType
-import io.ktor.http.path
 
 /**
  *  Fetches the events from the API and returns them as a JSON string
@@ -19,11 +17,8 @@ import io.ktor.http.path
  *  @param token the bearer token to use, provided by the [auth/google](api.team3990.com/auth/google) endpoint
  */
 suspend fun fetchEventsText(client: HttpClient, token: String): String {
-    return client.get {
+    return client.get("$techApiHost/events/future/with-attendance") {
         url {
-            protocol = URLProtocol.HTTPS
-            host = techApiHost
-            path("events/future/with-attendance")
             parameters.append("limit", "10")
             parameters.append("skip", "0")
         }
@@ -39,13 +34,7 @@ suspend fun fetchEventsText(client: HttpClient, token: String): String {
  */
 suspend fun fetchGoogle(client: HttpClient): String {
     return try {
-        client.get {
-            url {
-                protocol = URLProtocol.HTTPS
-                host = techApiHost
-                path("auth/google")
-            }
-        }.headers["Location"].toString()
+        client.get("$techApiHost/auth/google").headers["Location"].toString()
     } catch (e: Exception) {
         exceptionLog(e)
         "https://raphdf.ddns.net/tech/errors/fetchGoogle.html"
@@ -53,12 +42,7 @@ suspend fun fetchGoogle(client: HttpClient): String {
 }
 
 suspend fun fetchUser(client: HttpClient, token: String): String {
-    return client.get {
-        url {
-            protocol = URLProtocol.HTTPS
-            host = techApiHost
-            path("users/me")
-        }
+    return client.get(techApiHost + "users/me") {
         headers {
             append(Authorization, token)
         }
@@ -74,12 +58,7 @@ suspend fun changeAttendance(
     event: Event,
     status: String
 ): String {
-    return client.post {
-        url {
-            protocol = URLProtocol.HTTPS
-            host = techApiHost
-            path("events/attendance")
-        }
+    return client.post("$techApiHost/events/attendance") {
         headers {
             append(Authorization, token)
         }
@@ -110,12 +89,7 @@ fun invertAttendance(attendance: String): String {
  */
 suspend fun validateToken(client: HttpClient, token: String): Boolean {
     return try {
-        client.post {
-            url {
-                protocol = URLProtocol.HTTPS
-                host = techApiHost
-                path("auth/validate")
-            }
+        client.post("$techApiHost/auth/validate") {
             headers {
                 append(Authorization, token)
             }
