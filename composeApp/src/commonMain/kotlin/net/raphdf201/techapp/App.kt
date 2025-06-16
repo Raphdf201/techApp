@@ -18,6 +18,7 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -25,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
@@ -34,7 +36,7 @@ fun App(tkn: String = "") {
     val textColor = if (dark) Color.White else Color.Black
     val uriHandler = LocalUriHandler.current
     val scope = rememberCoroutineScope()
-
+    var recomposer = remember { Recomposer(scope.coroutineContext) }
     val viewModel = remember { AppViewModel(tkn) }
 
     Surface(modifier = Modifier.fillMaxSize(), color = backgroundColor) {
@@ -42,7 +44,19 @@ fun App(tkn: String = "") {
             Spacer(Modifier.height(50.dp))
 
             when (val state = viewModel.uiState) {
-                is UiState.Loading -> CircularProgressIndicator()
+                is UiState.Loading -> {
+                    CircularProgressIndicator()
+                    /*LaunchedEffect(Unit) {
+                        delay(5000)
+                        if (viewModel.uiState is UiState.Loading) {
+                            viewModel.uiState = UiState.Unauthenticated
+                        }
+                    }*/
+                    scope.launch {
+                        delay(5000)
+                        if (viewModel.uiState is UiState.Loading) viewModel.logout()
+                    }
+                }
 
                 is UiState.Unauthenticated -> LoginView(
                     viewModel.token,

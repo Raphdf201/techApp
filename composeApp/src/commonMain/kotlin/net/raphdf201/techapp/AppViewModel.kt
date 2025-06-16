@@ -1,17 +1,16 @@
 package net.raphdf201.techapp
 
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import io.ktor.client.HttpClient
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 sealed class UiState {
-    object Loading : UiState()
-    object Unauthenticated : UiState()
+    data object Loading : UiState()
+    data object Unauthenticated : UiState()
     data class Authenticated(val events: List<Event>, val user: List<User>) : UiState()
     data class Error(val message: String) : UiState()
 }
@@ -19,6 +18,7 @@ sealed class UiState {
 class AppViewModel(initialToken: String) {
     var token by mutableStateOf(initialToken)
     var uiState by mutableStateOf<UiState>(UiState.Loading)
+        private set
     private val client = HttpClient()
 
     init {
@@ -72,11 +72,16 @@ class AppViewModel(initialToken: String) {
             null
         }
     }
+
+    fun logout() {
+        uiState = UiState.Unauthenticated
+        token = ""
+    }
 }
 
-suspend fun CoroutineScope.launchSafely(block: suspend () -> Unit) {
+fun CoroutineScope.launchSafely(block: suspend () -> Unit, scope: CoroutineScope) {
     try {
-        withContext(Dispatchers.Default) { block() }
+        scope.launch { block() }
     } catch (e: Exception) {
         exceptionLog(e)
     }
