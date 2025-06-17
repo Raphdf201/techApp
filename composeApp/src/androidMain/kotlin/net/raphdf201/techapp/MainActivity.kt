@@ -35,12 +35,14 @@ class MainActivity : FragmentActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         intent.data?.let {
-            storeTokens(
-                Tokens(
-                    it.getQueryParameter(access).orEmpty(),
-                    it.getQueryParameter(refresh).orEmpty()
-                )
+            val received = Tokens(
+                it.getQueryParameter(access).orEmpty(),
+                it.getQueryParameter(refresh).orEmpty()
             )
+            storeTokens(received)
+            debugLog("received tokens : $received")
+            refreshAppInternalTokens()
+            debugLog("refreshed app internal tokens")
         }
     }
 }

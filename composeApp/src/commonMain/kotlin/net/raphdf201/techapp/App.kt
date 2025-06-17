@@ -48,6 +48,13 @@ fun App() {
         var tokens by remember { mutableStateOf(getTokens()) }
         var init by remember { mutableStateOf(false) }
 
+        if (!init) {
+            refreshAppInternalTokens = {
+                tokens = getTokens()
+            }
+            init = true
+        }
+
         if (dark) {
             backgroundColor = grey
             textColor = Color.White
@@ -65,19 +72,23 @@ fun App() {
                 AnimatedVisibility(!tokenValid) {
                     Column(modifier(), horizontalAlignment = Alignment.CenterHorizontally) {
                         Text("Current API : $techApiHost", Modifier, textColor)
+
                         Button({
                             networkLog("fetching google link")
                             runBlocking {
                                 openUri(
                                     uriHandler,
-                                    fetchGoogle(client)
+                                    googleLink
                                 )
                             }
+                            tokens = getTokens()
                         }) {
                             Text("Accéder au site", Modifier, textColor)
                         }
+
                         Button({
                             networkLog("validating token")
+                            tokens = getTokens()
                             runBlocking {
                                 tokenValid = validateToken(client, tokens.accessToken)
                             }
@@ -85,11 +96,13 @@ fun App() {
                         }) {
                             Text("Se connecter", Modifier, textColor)
                         }
+
                         Button({
-                            resetTokens(tokens)
+                            tokens = resetTokens()
                         }) {
                             Text("Se déconnecter", Modifier, textColor)
                         }
+
                         /*OutlinedTextField(
                             tokens.accessToken,
                             { tokens.accessToken = it },
@@ -166,7 +179,15 @@ fun App() {
                     }
                 }
                 Button({
+                    debugLog("old tokens : $tokens")
+                    tokens = getTokens()
+                    debugLog("new tokens : $tokens")
+                    runBlocking {
+                        tokenValid = validateToken(client, tokens.accessToken)
+                    }
+                    debugLog("token valid : $tokenValid")
                     if (tokenValid) {
+                        storeTokens(tokens)
                         networkLog("fetching events")
                         runBlocking {
                             eventsText = fetchEventsText(client, tokens.accessToken)
@@ -178,14 +199,28 @@ fun App() {
                             serializationLog("Error while decoding events error : ${e.message}")
                             serializationLog("Error while decoding events text : $eventsText")
                         }
-                    }
+                    } else if (!areTokensNull(tokens)) {
+                        runBlocking {
+                            networkLog("refreshing tokens")
+                            try {
+                                tokens = refreshTokens(client, tokens)
+                                storeTokens(tokens)
+                                tokenValid = validateToken(client, tokens.accessToken)
+                            } catch (e: Exception) {
+                                networkLog("failed token refresh : ${e.message}")
+                            }
+                        }
+                    } else debugLog("no tokens")
                 }, Modifier) {
                     Text("Refresh", Modifier, textColor)
                 }
+                Text("access token : ${tokens.accessToken}", Modifier, textColor)
+                Text("refresh token : ${tokens.refreshToken}", Modifier, textColor)
+                Text("token valid : $tokenValid", Modifier, textColor)
             }
         }
         if (tokens.accessToken == "null") {
-            tokens.accessToken = ""
+            tokens = updateAccess(tokens, "")
         }
         if (eventsText != "" && eventsText != unauthorized) {
             serializationLog("decoding events")
@@ -214,18 +249,6 @@ fun App() {
                 } catch (e: Exception) {
                     serializationLog("Error while decoding user error : ${e.message}")
                     serializationLog("Error while decoding user text : $userText")
-                }
-            }
-        }
-        if (!tokenValid) {
-            runBlocking {
-                networkLog("refreshing tokens")
-                try {
-                    tokens = refreshTokens(client, tokens)
-                    storeTokens(tokens)
-                    tokenValid = validateToken(client, tokens.accessToken)
-                } catch (e: Exception) {
-                    networkLog("failed token refresh : ${e.message}")
                 }
             }
         }

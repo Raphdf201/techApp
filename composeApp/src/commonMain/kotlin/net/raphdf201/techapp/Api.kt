@@ -102,12 +102,19 @@ suspend fun validateToken(client: HttpClient, token: String): Boolean {
 }
 
 suspend fun refreshTokens(client: HttpClient, tokens: Tokens): Tokens {
-    return client.post("$techApiHost/auth/refresh") {
+    val resp = client.post("$techApiHost/auth/refresh") {
         headers {
             append(Authorization, tokens.accessToken)
         }
         setBody("{\"refreshToken\":\"${tokens.refreshToken}\"}")
-    }.body()
+    }
+    return try {
+        resp.body()
+    } catch (e: Exception) {
+        exceptionLog(e)
+        networkLog("refresh error : ${resp.bodyAsText()}")
+        tokens
+    }
 }
 
 /**

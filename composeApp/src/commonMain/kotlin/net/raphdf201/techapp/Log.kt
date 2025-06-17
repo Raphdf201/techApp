@@ -10,6 +10,10 @@ fun serializationLog(message: String) {
     log(message, "serialization")
 }
 
+fun debugLog(message: String) {
+    log(message, "debug")
+}
+
 fun exceptionLog(exception: Exception) {
-    log(exception.message.toString(), "errors")
+    log(exception.message.toString(), "exceptions")
 }

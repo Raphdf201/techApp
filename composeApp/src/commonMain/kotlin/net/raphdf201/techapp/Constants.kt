@@ -23,5 +23,8 @@ const val absent = "absent"
 const val present = "present"
 const val waiting = "waiting"
 const val techApiHost = "https://raphdf.ddns.net/tech/api"
+const val googleLink = "$techApiHost/auth/googleMobile"
 const val access = "access_token"
 const val refresh = "refresh_token"
+
+var refreshAppInternalTokens = {}

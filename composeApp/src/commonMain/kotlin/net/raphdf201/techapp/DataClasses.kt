@@ -92,6 +92,6 @@ data class UserAttendance(
 
 @Serializable
 data class Tokens(
-    var accessToken: String,
-    var refreshToken: String
+    val accessToken: String,
+    val refreshToken: String
 )
