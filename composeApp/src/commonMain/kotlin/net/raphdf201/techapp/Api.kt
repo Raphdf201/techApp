@@ -2,6 +2,7 @@ package net.raphdf201.techapp
 
 import androidx.compose.ui.platform.UriHandler
 import io.ktor.client.HttpClient
+import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.headers
 import io.ktor.client.request.post
@@ -98,6 +99,15 @@ suspend fun validateToken(client: HttpClient, token: String): Boolean {
         exceptionLog(e)
         false
     }
+}
+
+suspend fun refreshTokens(client: HttpClient, tokens: Tokens): Tokens {
+    return client.post("$techApiHost/auth/refresh") {
+        headers {
+            append(Authorization, tokens.accessToken)
+        }
+        setBody("{\"refreshToken\":\"${tokens.refreshToken}\"}")
+    }.body()
 }
 
 /**

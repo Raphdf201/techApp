@@ -47,6 +47,7 @@ kotlin {
             implementation(libs.ktor.client.core)
             implementation(libs.ktor.client.auth)
             implementation(libs.kmpessentials)
+            implementation(libs.settings)
         }
         iosMain.dependencies {
             implementation(libs.ktor.client.ios)
@@ -57,12 +58,12 @@ kotlin {
 
 android {
     namespace = "net.raphdf201.techapp"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "net.raphdf201.techapp"
         minSdk = 24
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 1
         versionName = "1.0"
     }

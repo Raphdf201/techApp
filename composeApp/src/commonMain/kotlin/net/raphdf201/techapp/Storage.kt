@@ -1,31 +1,22 @@
 package net.raphdf201.techapp
 
-import com.architect.kmpessentials.fileSystem.KmpFileSystem
+import com.russhwolf.settings.Settings
 
-val file1 = KmpFileSystem.getAppDirectory().plus("/techTokens1")
-val file2 = KmpFileSystem.getAppDirectory().plus("/techTokens2")
-val file3 = KmpFileSystem.getAppDirectory().plus("/techTokens3")
+expect val settings: Settings
 
-fun store1(data: String) {
-    KmpFileSystem.writeTextToFileAt(file1, data)
+fun resetTokens(tokens: Tokens) {
+    tokens.accessToken = ""
+    tokens.refreshToken = ""
 }
 
-fun store2(data: String) {
-    KmpFileSystem.writeTextToFileAt(file2, data)
+fun storeTokens(tokens: Tokens) {
+    settings.putString(access, tokens.accessToken)
+    settings.putString(refresh, tokens.refreshToken)
 }
 
-fun store3(data: String) {
-    KmpFileSystem.writeTextToFileAt(file3, data)
-}
-
-fun get1(): String {
-    return KmpFileSystem.readTextFromFileAt(file1).toString()
-}
-
-fun get2(): String {
-    return KmpFileSystem.readTextFromFileAt(file2).toString()
-}
-
-fun get3(): String {
-    return KmpFileSystem.readTextFromFileAt(file3).toString()
+fun getTokens(): Tokens {
+    return Tokens(
+        settings.getString(access, ""),
+        settings.getString(refresh, "")
+    )
 }

@@ -15,10 +15,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonColors
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
-import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -36,20 +34,19 @@ import kotlinx.coroutines.runBlocking
  * The main composable function for the application
  */
 @Composable
-fun App(tkn: String = "") {
+fun App() {
     MaterialTheme {
-        var eventsText by remember { mutableStateOf("") }
-        var accessToken by remember { mutableStateOf("") }
-        var refreshToken by remember { mutableStateOf("") }
-        var eventsList by remember { mutableStateOf(listOf<Event>()) }
-        var me by remember { mutableStateOf(listOf<User>()) }
-        var tokenValid by remember { mutableStateOf(false) }
-        var init by remember { mutableStateOf(false) }
         val client by remember { mutableStateOf(HttpClient()) }
         val dark = isSystemInDarkTheme()
         val uriHandler = LocalUriHandler.current
         val backgroundColor: Color
         val textColor: Color
+        var eventsText by remember { mutableStateOf("") }
+        var eventsList by remember { mutableStateOf(listOf<Event>()) }
+        var me by remember { mutableStateOf(listOf<User>()) }
+        var tokenValid by remember { mutableStateOf(false) }
+        var tokens by remember { mutableStateOf(getTokens()) }
+        var init by remember { mutableStateOf(false) }
 
         if (dark) {
             backgroundColor = grey
@@ -57,11 +54,6 @@ fun App(tkn: String = "") {
         } else {
             backgroundColor = Color.White
             textColor = Color.Black
-        }
-
-        if (!init) {
-            accessToken = if (tkn == "") get1() else tkn
-            init = true
         }
 
         Surface(
@@ -72,6 +64,7 @@ fun App(tkn: String = "") {
                 Spacer(Modifier.height(50.dp))
                 AnimatedVisibility(!tokenValid) {
                     Column(modifier(), horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text("Current API : $techApiHost", Modifier, textColor)
                         Button({
                             networkLog("fetching google link")
                             runBlocking {
@@ -86,28 +79,27 @@ fun App(tkn: String = "") {
                         Button({
                             networkLog("validating token")
                             runBlocking {
-                                tokenValid = validateToken(client, accessToken)
+                                tokenValid = validateToken(client, tokens.accessToken)
                             }
-                            if (tokenValid) store1(accessToken)
+                            if (tokenValid) storeTokens(tokens)
                         }) {
                             Text("Se connecter", Modifier, textColor)
                         }
                         Button({
-                            accessToken = ""
-                            refreshToken = ""
+                            resetTokens(tokens)
                         }) {
                             Text("Se déconnecter", Modifier, textColor)
                         }
-                        OutlinedTextField(
-                            accessToken,
-                            { accessToken = it },
+                        /*OutlinedTextField(
+                            tokens.accessToken,
+                            { tokens.accessToken = it },
                             Modifier,
                             label = { Text("Access token", color = textColor) },
                             colors = TextFieldDefaults.outlinedTextFieldColors(
                                 textColor,
                                 unfocusedBorderColor = textColor
                             )
-                        )
+                        )*/
                     }
                 }
                 AnimatedVisibility(tokenValid) {
@@ -139,13 +131,13 @@ fun App(tkn: String = "") {
                                                             networkLog("fetching events")
                                                             runBlocking {
                                                                 changeAttendance(
-                                                                    client, accessToken,
+                                                                    client, tokens.accessToken,
                                                                     event, invertAttendance(type)
                                                                 )
                                                                 eventsText =
                                                                     fetchEventsText(
                                                                         client,
-                                                                        accessToken
+                                                                        tokens.accessToken
                                                                     )
                                                             }
                                                             serializationLog("decoding events")
@@ -177,7 +169,7 @@ fun App(tkn: String = "") {
                     if (tokenValid) {
                         networkLog("fetching events")
                         runBlocking {
-                            eventsText = fetchEventsText(client, accessToken)
+                            eventsText = fetchEventsText(client, tokens.accessToken)
                         }
                         serializationLog("decoding events")
                         try {
@@ -192,8 +184,8 @@ fun App(tkn: String = "") {
                 }
             }
         }
-        if (accessToken == "null") {
-            accessToken = ""
+        if (tokens.accessToken == "null") {
+            tokens.accessToken = ""
         }
         if (eventsText != "" && eventsText != unauthorized) {
             serializationLog("decoding events")
@@ -209,19 +201,31 @@ fun App(tkn: String = "") {
             if (tokenValid) {
                 networkLog("fetching events")
                 runBlocking {
-                    eventsText = fetchEventsText(client, accessToken)
+                    eventsText = fetchEventsText(client, tokens.accessToken)
                 }
             }
         }
         if (me.isEmpty() && tokenValid) {
             runBlocking {
                 serializationLog("decoding user info")
-                val userText = "[${fetchUser(client, accessToken)}]"
+                val userText = "[${fetchUser(client, tokens.accessToken)}]"
                 try {
                     me = jsonDecoder.decodeFromString(userText)
                 } catch (e: Exception) {
                     serializationLog("Error while decoding user error : ${e.message}")
                     serializationLog("Error while decoding user text : $userText")
+                }
+            }
+        }
+        if (!tokenValid) {
+            runBlocking {
+                networkLog("refreshing tokens")
+                try {
+                    tokens = refreshTokens(client, tokens)
+                    storeTokens(tokens)
+                    tokenValid = validateToken(client, tokens.accessToken)
+                } catch (e: Exception) {
+                    networkLog("failed token refresh : ${e.message}")
                 }
             }
         }

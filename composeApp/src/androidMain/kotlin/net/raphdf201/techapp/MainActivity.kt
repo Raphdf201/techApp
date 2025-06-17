@@ -1,10 +1,14 @@
 package net.raphdf201.techapp
 
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.fragment.app.FragmentActivity
 import com.architect.kmpessentials.KmpAndroid
+import com.russhwolf.settings.Settings
+import com.russhwolf.settings.SharedPreferencesSettings
 import logcat.AndroidLogcatLogger
 import logcat.LogPriority
 import logcat.LogPriority.INFO
@@ -23,6 +27,7 @@ class MainActivity : FragmentActivity() {
             App()
         }
         instance = this
+        delegate = this.getSharedPreferences("techApp", Context.MODE_PRIVATE)
         KmpAndroid.initializeApp(this) {}
         AndroidLogcatLogger.installOnDebuggableApp(this.application, minPriority = VERBOSE)
     }
@@ -30,9 +35,11 @@ class MainActivity : FragmentActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         intent.data?.let {
-            registerTokens(
-                it.getQueryParameter("access_token"),
-                it.getQueryParameter("refresh_token")
+            storeTokens(
+                Tokens(
+                    it.getQueryParameter(access).orEmpty(),
+                    it.getQueryParameter(refresh).orEmpty()
+                )
             )
         }
     }
@@ -41,6 +48,10 @@ class MainActivity : FragmentActivity() {
 actual fun log(message: String, tag: String) {
     logcat(tag, INFO, message)
 }
+
+lateinit var delegate: SharedPreferences
+
+actual val settings: Settings by lazy { SharedPreferencesSettings(delegate) }
 
 fun logcat(tag: String, priority: LogPriority, message: String) {
     logcat(tag, priority) { message }
