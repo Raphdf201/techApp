@@ -89,3 +89,9 @@ data class UserAttendance(
     val markedAt: String?,
     val user: User?
 )
+
+@Serializable
+data class Tokens(
+    val accessToken: String,
+    val refreshToken: String
+)

@@ -26,31 +26,7 @@
 
                 <data
                     android:host="login"
-                    android:scheme="techforkids" />
-            </intent-filter>
-            <intent-filter android:autoVerify="true">
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-
-                <!-- If a user clicks on a shared link that uses the "http" scheme, your
-                     app should be able to delegate that traffic to "https". -->
-                <!-- Do not include other schemes. -->
-                <data android:scheme="http" />
-                <data android:scheme="https" />
-
-                <!-- Include one or more domains that should be verified. -->
-                <data android:host="@string/domain" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-
-                <data android:scheme="techforkids" />
-                <data android:host="@string/domain" />
+                    android:scheme="techforkids" /><!-- techforkids://login/callback -->
             </intent-filter>
         </activity>
     </application>
