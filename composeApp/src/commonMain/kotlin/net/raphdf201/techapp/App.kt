@@ -47,7 +47,6 @@ fun App() {
         var tokenValid by remember { mutableStateOf(false) }
         var tokens by remember { mutableStateOf(getTokens()) }
         var init by remember { mutableStateOf(false) }
-        var counter by remember { mutableStateOf(0) }
 
         if (!init) {
             refreshAppInternalTokens = {
