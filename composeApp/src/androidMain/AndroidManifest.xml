@@ -25,7 +25,6 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:path="/callback"
                     android:host="login"
                     android:scheme="techforkids" /><!-- techforkids://login/callback -->
             </intent-filter>

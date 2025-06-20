@@ -1,7 +1,6 @@
 package net.raphdf201.techapp
 
 import android.content.Context
-import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.activity.compose.setContent
@@ -30,18 +29,15 @@ class MainActivity : FragmentActivity() {
         delegate = this.getSharedPreferences("techApp", Context.MODE_PRIVATE)
         KmpAndroid.initializeApp(this) {}
         AndroidLogcatLogger.installOnDebuggableApp(this.application, minPriority = VERBOSE)
-    }
-
-    override fun onNewIntent(intent: Intent) {
-        super.onNewIntent(intent)
         intent.data?.let {
+            debugLog("URL : $it")
             val received = Tokens(
                 it.getQueryParameter(access).orEmpty(),
                 it.getQueryParameter(refresh).orEmpty()
             )
             storeTokens(received)
             debugLog("received tokens : $received")
-            refreshAppInternalTokens()
+            refreshAppInternalTokens(received)
             debugLog("refreshed app internal tokens")
         }
     }

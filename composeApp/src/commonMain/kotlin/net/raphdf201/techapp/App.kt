@@ -47,10 +47,11 @@ fun App() {
         var tokenValid by remember { mutableStateOf(false) }
         var tokens by remember { mutableStateOf(getTokens()) }
         var init by remember { mutableStateOf(false) }
+        var counter by remember { mutableStateOf(0) }
 
         if (!init) {
             refreshAppInternalTokens = {
-                tokens = getTokens()
+                tokens = it
             }
             init = true
         }
@@ -81,26 +82,23 @@ fun App() {
                                     googleLink
                                 )
                             }
-                            tokens = getTokens()
-                        }) {
-                            Text("Accéder au site", Modifier, textColor)
-                        }
-
-                        Button({
-                            networkLog("validating token")
-                            tokens = getTokens()
-                            runBlocking {
-                                tokenValid = validateToken(client, tokens.accessToken)
-                            }
-                            if (tokenValid) storeTokens(tokens)
                         }) {
                             Text("Se connecter", Modifier, textColor)
                         }
 
                         Button({
-                            tokens = resetTokens()
+                            networkLog("validating token")
+                            tokens = Tokens(
+                                bearer + tokens.accessToken,
+                                bearer + tokens.refreshToken
+                            )
+                            runBlocking {
+                                tokenValid = validateToken(client, tokens.accessToken)
+                            }
+                            if (tokenValid) storeTokens(tokens)
+                            debugLog("token valid : $tokenValid")
                         }) {
-                            Text("Se déconnecter", Modifier, textColor)
+                            Text("Évènements", Modifier, textColor)
                         }
 
                         /*OutlinedTextField(
@@ -212,11 +210,11 @@ fun App() {
                         }
                     } else debugLog("no tokens")
                 }, Modifier) {
-                    Text("Refresh", Modifier, textColor)
+                    Text("Actualiser", Modifier, textColor)
                 }
-                Text("access token : ${tokens.accessToken}", Modifier, textColor)
+                /*Text("access token : ${tokens.accessToken}", Modifier, textColor)
                 Text("refresh token : ${tokens.refreshToken}", Modifier, textColor)
-                Text("token valid : $tokenValid", Modifier, textColor)
+                Text("token valid : $tokenValid", Modifier, textColor)*/
             }
         }
         if (tokens.accessToken == "null") {

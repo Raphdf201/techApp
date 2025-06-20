@@ -11,6 +11,9 @@ import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders.Authorization
 import io.ktor.http.contentType
+import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 
 /**
  *  Fetches the events from the API and returns them as a JSON string
@@ -18,7 +21,9 @@ import io.ktor.http.contentType
  *  @param token the bearer token to use, provided by the [auth/google](api.team3990.com/auth/google) endpoint
  */
 suspend fun fetchEventsText(client: HttpClient, token: String): String {
-    return client.get("$techApiHost/events/future/with-attendance") {
+    val url = "$techApiHost/events/future/with-attendance"
+    networkLog("GET $url")
+    return client.get(url) {
         url {
             parameters.append("limit", "10")
             parameters.append("skip", "0")
@@ -29,25 +34,19 @@ suspend fun fetchEventsText(client: HttpClient, token: String): String {
     }.bodyAsText()
 }
 
-/**
- *  Fetches the google link from the API and returns it
- *  @param client the ktor client to use
- */
-suspend fun fetchGoogle(client: HttpClient): String {
+suspend fun fetchUser(client: HttpClient, token: String): String {
+    val url = "$techApiHost/users/me"
+    networkLog("GET $url")
     return try {
-        client.get("$techApiHost/auth/google").headers["Location"].toString()
+        client.get(url) {
+            headers {
+                append(Authorization, token)
+            }
+        }.bodyAsText()
     } catch (e: Exception) {
         exceptionLog(e)
-        "https://raphdf.ddns.net/tech/errors/fetchGoogle.html"
+        unauthorized
     }
-}
-
-suspend fun fetchUser(client: HttpClient, token: String): String {
-    return client.get(techApiHost + "users/me") {
-        headers {
-            append(Authorization, token)
-        }
-    }.bodyAsText()
 }
 
 /**
@@ -59,13 +58,20 @@ suspend fun changeAttendance(
     event: Event,
     status: String
 ): String {
-    return client.post("$techApiHost/events/attendance") {
-        headers {
-            append(Authorization, token)
-        }
-        contentType(ContentType.Application.Json)
-        setBody("{\"from\":\"${event.beginDate}\",\"to\":\"${event.endDate}\",\"type\":\"$status\",\"eventId\":${event.id}}")
-    }.status.toString()
+    val url = "$techApiHost/events/attendance"
+    networkLog("POST $url")
+    return try {
+        client.post(url) {
+            headers {
+                append(Authorization, token)
+            }
+            contentType(ContentType.Application.Json)
+            setBody("{\"from\":\"${event.beginDate}\",\"to\":\"${event.endDate}\",\"type\":\"$status\",\"eventId\":${event.id}}")
+        }.status.toString()
+    } catch (e: Exception) {
+        exceptionLog(e)
+        waiting
+    }
 }
 
 /**
@@ -80,8 +86,7 @@ fun invertAttendance(attendance: String): String {
     return when (attendance) {
         absent -> present
         present -> absent
-        waiting -> waiting
-        else -> ""
+        else -> waiting
     }
 }
 
@@ -89,8 +94,10 @@ fun invertAttendance(attendance: String): String {
  * Validates the token using the [auth/validate](api.team3990.com/auth/validate) endpoint
  */
 suspend fun validateToken(client: HttpClient, token: String): Boolean {
+    val url = "$techApiHost/auth/validate"
+    networkLog("POST $url")
     return try {
-        client.post("$techApiHost/auth/validate") {
+        client.post(url) {
             headers {
                 append(Authorization, token)
             }
@@ -102,7 +109,9 @@ suspend fun validateToken(client: HttpClient, token: String): Boolean {
 }
 
 suspend fun refreshTokens(client: HttpClient, tokens: Tokens): Tokens {
-    val resp = client.post("$techApiHost/auth/refresh") {
+    val url = "$techApiHost/auth/refresh"
+    networkLog("POST $url")
+    val resp = client.post(url) {
         headers {
             append(Authorization, tokens.accessToken)
         }
@@ -126,4 +135,11 @@ fun openUri(handler: UriHandler, uri: String) {
     } catch (e: Exception) {
         exceptionLog(e)
     }
+}
+
+fun getDate(date: String): Instant = Instant.parse(date.replaceFirst(" ", "T"))
+
+fun getReadableDate(date: Instant): String {
+    val local = date.toLocalDateTime(TimeZone.of("UTC-4"))
+    return local.date.toString() + " " + local.time
 }

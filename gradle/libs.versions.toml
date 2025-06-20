@@ -1,5 +1,5 @@
 [versions]
-agp = "8.10.0"
+agp = "8.10.1"
 androidx-activityCompose = "1.10.1"
 androidx-lifecycle = "2.9.0"
 androidx-fragment = "1.8.8"
@@ -7,10 +7,11 @@ compose-multiplatform = "1.8.1"
 dokka = "2.0.0"
 kmpessentials = "2.3.2"
 kotlin = "2.1.21"
-kotlinxSerializationJson = "1.8.1"
+kotlinx-serialization-json = "1.8.1"
+kotlinx-datetime = "0.6.2"
 ktor = "3.1.3"
 logcat = "0.2.3"
-uiTextGoogleFonts = "1.8.2"
+uiTextGoogleFonts = "1.8.3"
 material3Android = "1.3.2"
 multiplatform-settings = "1.3.0"
 
@@ -21,7 +22,8 @@ androidx-lifecycle-viewmodel = { group = "org.jetbrains.androidx.lifecycle", nam
 androidx-lifecycle-runtime-compose = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "androidx-lifecycle" }
 kmpessentials = { module = "io.github.thearchitect123:kmpEssentials", version.ref = "kmpessentials" }
 kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib" }
-kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization-json" }
+kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinx-datetime" }
 ktor-client-android = { module = "io.ktor:ktor-client-android", version.ref = "ktor" }
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
 ktor-client-auth = { module = "io.ktor:ktor-client-auth", version.ref = "ktor" }
