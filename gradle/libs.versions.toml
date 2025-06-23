@@ -1,7 +1,7 @@
 [versions]
 agp = "8.10.1"
 androidx-activityCompose = "1.10.1"
-androidx-lifecycle = "2.9.0"
+androidx-lifecycle = "2.9.1"
 androidx-fragment = "1.8.8"
 compose-multiplatform = "1.8.1"
 dokka = "2.0.0"
