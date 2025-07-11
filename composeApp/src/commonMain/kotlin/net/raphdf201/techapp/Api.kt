@@ -11,9 +11,10 @@ import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders.Authorization
 import io.ktor.http.contentType
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import kotlin.time.ExperimentalTime
 
 /**
  *  Fetches the events from the API and returns them as a JSON string
@@ -137,8 +138,10 @@ fun openUri(handler: UriHandler, uri: String) {
     }
 }
 
+@OptIn(ExperimentalTime::class)
 fun getDate(date: String): Instant = Instant.parse(date.replaceFirst(" ", "T"))
 
+@OptIn(ExperimentalTime::class)
 fun getReadableDate(date: Instant): String {
     val local = date.toLocalDateTime(TimeZone.of("UTC-4"))
     return local.date.toString() + " " + local.time
